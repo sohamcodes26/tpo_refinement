@@ -64,7 +64,7 @@
             overflow: hidden; /* Prevent body from scrolling, let children handle it */
         }
         .sidebar {
-            width: 300px; /* Increased width for better text visibility */
+            width: 300px; /* Default width for larger screens */
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -73,8 +73,30 @@
             height: 100%; /* Make sidebar fill 100% height of its flex parent (body) */
             overflow-y: auto; /* Allow sidebar content to scroll if it overflows */
         }
-        .sidebar-collapsed {
-            width: 90px; /* Adjusted width for collapsed state */
+        /* Responsive sidebar adjustments */
+        @media (max-width: 768px) { /* On medium screens and smaller */
+            .sidebar {
+                width: 0; /* Hidden by default on small screens */
+                position: absolute;
+                z-index: 50; /* Ensure it's above other content when open */
+                left: 0;
+                top: 0;
+                height: 100%;
+                overflow-x: hidden; /* Hide horizontal scrollbar when collapsed */
+            }
+            .sidebar.sidebar-open {
+                width: 250px; /* Open width on small screens */
+            }
+            .sidebar-toggle-container {
+                display: block; /* Show toggle button on small screens */
+            }
+            .main-content-area {
+                margin-left: 0; /* No margin when sidebar is hidden */
+            }
+        }
+
+        .sidebar-collapsed { /* This class will now be used for the visual collapsed state on larger screens */
+            width: 90px;
         }
         .sidebar-item {
             display: flex;
@@ -162,7 +184,6 @@
             color: #ffffff;
         }
         .metric-card {
-            /* Now the default metric card also has a gradient */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Default blue gradient */
             color: white;
             padding: 1.5rem;
@@ -202,38 +223,39 @@
         .toggle-button:hover {
             background-color: var(--toggle-button-hover-bg);
         }
+        /* Table responsiveness */
         .data-table-container {
-            /* Removed overflow-x: auto here, will apply directly to table if needed */
+            overflow-x: auto; /* Allow horizontal scrolling for tables on small screens */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
         .data-table {
             width: 100%; /* Make table take full width of its container */
-            table-layout: fixed; /* Distribute column widths evenly */
+            min-width: 900px; /* Ensure a minimum width for the table to prevent squishing */
+            table-layout: auto; /* Allow columns to size based on content, but with min-width */
         }
         .data-table th, .data-table td {
-            /* Removed white-space: nowrap; and text-overflow: ellipsis; */
-            overflow: hidden; /* Keep overflow hidden for consistent height */
-            padding: 0.75rem; /* Reduced padding for more content space */
-            word-wrap: break-word; /* Allow long words to break and wrap */
-            color: var(--text-color); /* Apply text color variable */
+            padding: 0.75rem;
+            word-wrap: break-word;
+            color: var(--text-color);
+            min-width: 80px; /* Minimum width for table cells */
         }
-        /* Specific column width adjustments for better fit */
-        .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 15%; } /* Company */
-        .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 18%; } /* Company Info - Increased width */
-        .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 10%; } /* Criteria */
-        .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 15%; } /* Selection Procedure */
-        .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 10%; } /* Reg Start Time - Reduced width */
-        .data-table th:nth-child(6), .data-table td:nth-child(6) { width: 10%; } /* Reg End Time - Reduced width */
-        .data-table th:nth-child(7), .data-table td:nth-child(7) { width: 7%; }  /* Max Package */
-        .data-table th:nth-child(8), .data-table td:nth-child(8) { width: 7%; }  /* Min Package */
-        .data-table th:nth-child(9), .data-table td:nth-child(9) { width: 8%; } /* Placement Type */
-        .data-table th:nth-child(10), .data-table td:nth-child(10) { width: 8%; } /* Academic Year */
-
+        /* Remove specific column width adjustments, let table-layout: auto handle it */
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { min-width: 120px; } /* Company */
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { min-width: 150px; } /* Company Info */
+        .data-table th:nth-child(3), .data-table td:nth-child(3) { min-width: 100px; } /* Criteria */
+        .data-table th:nth-child(4), .data-table td:nth-child(4) { min-width: 150px; } /* Selection Procedure */
+        .data-table th:nth-child(5), .data-table td:nth-child(5) { min-width: 120px; } /* Reg Start Time */
+        .data-table th:nth-child(6), .data-table td:nth-child(6) { min-width: 120px; } /* Reg End Time */
+        .data-table th:nth-child(7), .data-table td:nth-child(7) { min-width: 80px; }  /* Max Package */
+        .data-table th:nth-child(8), .data-table td:nth-child(8) { min-width: 80px; }  /* Min Package */
+        .data-table th:nth-child(9), .data-table td:nth-child(9) { min-width: 100px; } /* Placement Type */
+        .data-table th:nth-child(10), .data-table td:nth-child(10) { min-width: 100px; } /* Academic Year */
 
         .profile-card {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
-            border: 1px solid var(--border-color); /* Added subtle border */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+            border: 1px solid var(--border-color);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
             padding: 1.5rem;
             text-align: center;
             display: flex;
@@ -245,12 +267,12 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
         }
         .profile-card:hover {
-            transform: translateY(-3px); /* Lift card slightly on hover */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12); /* Stronger shadow on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
         }
         .profile-card i {
             font-size: 3rem;
-            color: var(--profile-icon-color); /* Use variable for icon color */
+            color: var(--profile-icon-color);
             margin-bottom: 0.75rem;
         }
         .profile-card .status-icon {
@@ -259,13 +281,23 @@
             left: 0.75rem;
             font-size: 1.5rem;
         }
-        .profile-card .add-icon {
+        .profile-card .action-icons {
             position: absolute;
             bottom: 0.75rem;
             right: 0.75rem;
-            font-size: 1.5rem;
-            color: #48bb78; /* Keep green for add icon */
+            display: flex;
+            gap: 0.5rem;
+        }
+        .profile-card .action-icons i {
+            font-size: 1.25rem;
             cursor: pointer;
+            margin: 0;
+        }
+        .profile-card .action-icons .edit-icon {
+            color: #2563eb;
+        }
+        .profile-card .action-icons .delete-icon {
+            color: #ef4444;
         }
         .alert-box {
             padding: 1rem;
@@ -293,13 +325,13 @@
             margin-bottom: 0.75rem;
         }
         .instruction-list strong {
-            color: var(--text-color); /* Apply text color variable */
+            color: var(--text-color);
         }
         .registration-card {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
-            border: 1px solid var(--border-color); /* Added subtle border */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+            border: 1px solid var(--border-color);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
@@ -307,22 +339,22 @@
             min-height: 120px;
             text-align: center;
             position: relative;
-            overflow: hidden; /* For the paper icon */
+            overflow: hidden;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
         }
         .registration-card:hover {
-            transform: translateY(-3px); /* Lift card slightly on hover */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12); /* Stronger shadow on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
         }
         .registration-card::before {
-            content: "\f15c"; /* Font Awesome file-alt icon */
+            content: "\f15c";
             font-family: "Font Awesome 5 Free";
             font-weight: 900;
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
             font-size: 2rem;
-            color: var(--border-color); /* Use border color for the icon */
+            color: var(--border-color);
             opacity: 0.5;
             transition: color 0.3s ease;
         }
@@ -330,30 +362,75 @@
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: var(--text-color); /* Apply text color variable */
+            color: var(--text-color);
         }
         .registration-card p {
             font-size: 0.9rem;
-            color: var(--text-color); /* Apply text color variable */
+            color: var(--text-color);
         }
         /* Specific adjustments for collapsed sidebar items */
         .sidebar-collapsed .sidebar-item {
-            padding: 0.75rem; /* Equal padding all around for a more circular/capsule look */
-            justify-content: center; /* Center content horizontally */
-            margin: 0.5rem auto; /* Center the item itself within the sidebar */
-            width: fit-content; /* Allow width to shrink to content + padding */
-            min-width: 40px; /* Ensure a minimum size for the capsule */
+            padding: 0.75rem;
+            justify-content: center;
+            margin: 0.5rem auto;
+            width: fit-content;
+            min-width: 40px;
         }
         .sidebar-collapsed .sidebar-item i {
-            margin-right: 0; /* Remove margin right for icons */
+            margin-right: 0;
         }
         .sidebar-collapsed .sidebar-item span {
-            display: none; /* Explicitly hide text */
+            display: none;
         }
         /* Ensure the active state capsule is also centered and sized correctly */
         .sidebar-collapsed .sidebar-item.active {
             /* No specific margin-top needed here if general margin:auto handles centering */
-            /* If the logo still overlaps, we can add more margin-bottom to the logo container */
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.hidden {
+            display: none;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .close-button {
+            color: var(--text-color);
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #ef4444;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -361,12 +438,12 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar flex flex-col p-4">
-        <div class="flex items-center justify-between mb-10 px-2"> <!-- Increased mb for more space -->
-            <div id="eduplusLogo" class="flex items-center cursor-pointer"> <!-- Added id and cursor-pointer -->
+        <div class="flex items-center justify-between mb-10 px-2">
+            <div id="eduplusLogo" class="flex items-center cursor-pointer">
                 <img src="https://placehold.co/40x40/667eea/ffffff?text=EP" alt="Eduplus Logo" class="rounded-full mr-3">
                 <h1 class="text-xl font-bold text-white whitespace-nowrap">Eduplus</h1>
             </div>
-            <button id="sidebarToggle" class="toggle-button">
+            <button id="sidebarToggle" class="toggle-button md:hidden"> <!-- Show only on medium and smaller screens -->
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -429,19 +506,19 @@
     </aside>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col main-content-area">
         <!-- Header -->
-        <header class="header p-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <h2 class="text-2xl font-semibold" id="currentSectionTitle">Eduplus Campus TPO Home Page</h2>
+        <header class="header p-4 flex flex-col sm:flex-row items-center justify-between">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <h2 class="text-xl sm:text-2xl font-semibold" id="currentSectionTitle">Eduplus Campus TPO Home Page</h2>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex flex-wrap items-center justify-center sm:justify-end space-x-4">
                 <!-- Theme Toggle Button -->
                 <button id="themeToggle" class="text-gray-600 dark:text-gray-300 text-xl focus:outline-none">
                     <i class="fas fa-moon"></i>
                 </button>
 
-                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                <div class="flex items-center text-gray-600 dark:text-gray-300 text-sm sm:text-base">
                     <i class="fas fa-wifi mr-2"></i>
                     <span>169 Mbps</span>
                 </div>
@@ -457,28 +534,28 @@
         </header>
 
         <!-- Page Content Sections -->
-        <main class="flex-1 overflow-y-auto p-6"> <!-- Removed bg-gray-100 from here, handled by body background -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6">
 
             <!-- Home Page Section -->
             <section id="home-page-content" class="content-section">
                 <div class="card p-6 text-center">
-                    <h3 class="text-3xl font-bold mb-4">Welcome to Eduplus Campus TPO!</h3>
-                    <p class="text-lg text-gray-700 dark:text-gray-300">Your central hub for all campus placement and training activities.</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold mb-4">Welcome to Eduplus Campus TPO!</h3>
+                    <p class="text-base sm:text-lg text-gray-700 dark:text-gray-300">Your central hub for all campus placement and training activities.</p>
                     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="card p-4 flex flex-col items-center">
-                            <i class="fas fa-building text-4xl text-blue-500 mb-3"></i>
-                            <h4 class="font-semibold text-xl mb-2">Explore Companies</h4>
-                            <p class="text-center text-gray-600 dark:text-gray-400">Discover new opportunities from various companies.</p>
+                            <i class="fas fa-building text-3xl sm:text-4xl text-blue-500 mb-3"></i>
+                            <h4 class="font-semibold text-lg sm:text-xl mb-2">Explore Companies</h4>
+                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Discover new opportunities from various companies.</p>
                         </div>
                         <div class="card p-4 flex flex-col items-center">
-                            <i class="fas fa-user-check text-4xl text-green-500 mb-3"></i>
-                            <h4 class="font-semibold text-xl mb-2">Manage Profile</h4>
-                            <p class="text-center text-gray-600 dark:text-gray-400">Keep your academic and personal details up-to-date.</p>
+                            <i class="fas fa-user-check text-3xl sm:text-4xl text-green-500 mb-3"></i>
+                            <h4 class="font-semibold text-lg sm:text-xl mb-2">Manage Profile</h4>
+                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Keep your academic and personal details up-to-date.</p>
                         </div>
                         <div class="card p-4 flex flex-col items-center">
-                            <i class="fas fa-calendar-check text-4xl text-purple-500 mb-3"></i>
-                            <h4 class="font-semibold text-xl mb-2">View Schedules</h4>
-                            <p class="text-center text-gray-600 dark:text-gray-400">Stay informed about your upcoming interviews and tests.</p>
+                            <i class="fas fa-calendar-check text-3xl sm:text-4xl text-purple-500 mb-3"></i>
+                            <h4 class="font-semibold text-lg sm:text-xl mb-2">View Schedules</h4>
+                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Stay informed about your upcoming interviews and tests.</p>
                         </div>
                     </div>
                 </div>
@@ -487,8 +564,8 @@
             <!-- Companies Dashboard Section -->
             <section id="company-dashboard-content" class="content-section hidden">
                 <!-- Metric Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="metric-card"> <!-- This card now uses the default blue gradient -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="metric-card">
                         <div class="metric-label">Total Companies</div>
                         <div class="metric-value">120</div>
                     </div>
@@ -507,100 +584,40 @@
                 </div>
 
                 <!-- Search and Filters -->
-                <div class="card p-6 mb-6">
+                <div class="card p-4 sm:p-6 mb-6">
                     <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
                         <div class="relative flex-grow w-full md:w-auto">
                             <input type="text" placeholder="Search companies..." class="search-input pr-10" id="searchInput">
                             <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         </div>
-                        <div class="flex flex-wrap justify-center md:justify-end gap-2">
-                            <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">Company Info</button>
-                            <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">Criteria</button>
-                            <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">Selection Procedure</button>
-                            <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">Filters <i class="fas fa-filter ml-2"></i></button>
+                        <div class="flex flex-wrap justify-center md:justify-end gap-2 mt-4 md:mt-0">
+                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Company Info</button>
+                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Criteria</button>
+                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Selection Procedure</button>
+                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Filters <i class="fas fa-filter ml-2"></i></button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Data Table -->
-                <div class="card p-6 data-table-container">
+                <div class="card p-4 sm:p-6 data-table-container">
                     <table class="w-full text-left data-table">
                         <thead>
                             <tr class="table-header rounded-t-lg">
-                                <th class="p-4 rounded-tl-lg">Company</th>
-                                <th class="p-4">Company Info</th>
-                                <th class="p-4">Criteria</th>
-                                <th class="p-4">Selection Procedure</th>
-                                <th class="p-4">Registration Start Time</th>
-                                <th class="p-4">Registration End Time</th>
-                                <th class="p-4">Max Package</th>
-                                <th class="p-4">Min Package</th>
-                                <th class="p-4">Placement Type</th>
-                                <th class="p-4 rounded-tr-lg">Academic Year</th>
+                                <th class="p-2 sm:p-4 rounded-tl-lg">Company</th>
+                                <th class="p-2 sm:p-4">Company Info</th>
+                                <th class="p-2 sm:p-4">Criteria</th>
+                                <th class="p-2 sm:p-4">Selection Procedure</th>
+                                <th class="p-2 sm:p-4">Reg Start Time</th>
+                                <th class="p-2 sm:p-4">Reg End Time</th>
+                                <th class="p-2 sm:p-4">Max Package</th>
+                                <th class="p-2 sm:p-4">Min Package</th>
+                                <th class="p-2 sm:p-4">Placement Type</th>
+                                <th class="p-2 sm:p-4 rounded-tr-lg">Academic Year</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Example Data Rows (will be populated by JS) -->
-                            <tr class="table-row">
-                                <td class="p-4">Tech Solutions Inc.</td>
-                                <td class="p-4">Software Development and Cloud Solutions</td>
-                                <td class="p-4">CGPA > 7.0</td>
-                                <td class="p-4">Online Test, Technical Interview, HR Interview</td>
-                                <td class="p-4">2024-07-01 09:00</td>
-                                <td class="p-4">2024-07-15 17:00</td>
-                                <td class="p-4">12 LPA</td>
-                                <td class="p-4">8 LPA</td>
-                                <td class="p-4">Full-time</td>
-                                <td class="p-4">2025</td>
-                            </tr>
-                            <tr class="table-row">
-                                <td class="p-4">Global Innovations</td>
-                                <td class="p-4">Data Analytics and Business Intelligence</td>
-                                <td class="p-4">CGPA > 7.5</td>
-                                <td class="p-4">Case Study, Group Discussion, Interview</td>
-                                <td class="p-4">2024-07-05 10:00</td>
-                                <td class="p-4">2024-07-20 18:00</td>
-                                <td class="p-4">15 LPA</td>
-                                <td class="p-4">10 LPA</td>
-                                <td class="p-4">Internship</td>
-                                <td class="p-4">2025</td>
-                            </tr>
-                            <tr class="table-row">
-                                <td class="p-4">Creative Minds Ltd.</td>
-                                <td class="p-4">UI/UX Design and Product Management</td>
-                                <td class="p-4">Portfolio Review</td>
-                                <td class="p-4">Design Challenge, Technical Interview, HR Interview</td>
-                                <td class="p-4">2024-07-10 11:00</td>
-                                <td class="p-4">2024-07-25 16:00</td>
-                                <td class="p-4">9 LPA</td>
-                                <td class="p-4">6 LPA</td>
-                                <td class="p-4">Full-time</td>
-                                <td class="p-4">2026</td>
-                            </tr>
-                            <tr class="table-row">
-                                <td class="p-4">FutureTech Solutions</td>
-                                <td class="p-4">Cloud Engineering and DevOps Practices</td>
-                                <td class="p-4">CGPA > 6.5</td>
-                                <td class="p-4">Technical Interview, System Design Round</td>
-                                <td class="p-4">2024-07-12 10:30</td>
-                                <td class="p-4">2024-07-28 17:30</td>
-                                <td class="p-4">14 LPA</td>
-                                <td class="p-4">9 LPA</td>
-                                <td class="p-4">Full-time</td>
-                                <td class="p-4">2025</td>
-                            </tr>
-                            <tr class="table-row">
-                                <td class="p-4">Innovate Systems</td>
-                                <td class="p-4">Cybersecurity Solutions and Network Security</td>
-                                <td class="p-4">Certifications</td>
-                                <td class="p-4">Practical Test, Technical Interview, HR Interview</td>
-                                <td class="p-4">2024-07-15 09:30</td>
-                                <td class="p-4">2024-07-30 16:00</td>
-                                <td class="p-4">13 LPA</td>
-                                <td class="p-4">8.5 LPA</td>
-                                <td class="p-4">Full-time</td>
-                                <td class="p-4">2025</td>
-                            </tr>
+                        <tbody id="companyTableBody">
+                            <!-- Data will be populated by JS -->
                         </tbody>
                     </table>
 
@@ -614,12 +631,12 @@
                                 <option value="20">20</option>
                             </select>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="pagination-button"><i class="fas fa-chevron-left"></i></button>
-                            <button class="pagination-button active">1</button>
-                            <button class="pagination-button">2</button>
-                            <button class="pagination-button">3</button>
-                            <button class="pagination-button"><i class="fas fa-chevron-right"></i></button>
+                        <div class="flex items-center space-x-2" id="paginationControls">
+                            <button class="pagination-button" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                            <div id="pageNumbers" class="flex space-x-2">
+                                <!-- Page numbers will be inserted here by JS -->
+                            </div>
+                            <button class="pagination-button" id="nextPage"><i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
                 </div>
@@ -627,33 +644,23 @@
 
             <!-- Applied Companies Section -->
             <section id="applied-companies-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Applied Companies</h3>
-                    <div class="alert-box blue mb-4">
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Applied Companies</h3>
+                    <div class="alert-box blue mb-4 text-sm sm:text-base">
                         <i class="fas fa-info-circle"></i>
                         <span>No companies applied yet. Start applying to new opportunities!</span>
                     </div>
-                    <!-- Placeholder for a table if companies are applied -->
                     <div class="data-table-container">
                         <table class="w-full text-left data-table">
                             <thead>
                                 <tr class="table-header rounded-t-lg">
-                                    <th class="p-4 rounded-tl-lg">Company Name</th>
-                                    <th class="p-4">Application Date</th>
-                                    <th class="p-4">Status</th>
-                                    <th class="p-4 rounded-tr-lg">Actions</th>
+                                    <th class="p-2 sm:p-4 rounded-tl-lg">Company Name</th>
+                                    <th class="p-2 sm:p-4">Application Date</th>
+                                    <th class="p-2 sm:p-4">Status</th>
+                                    <th class="p-2 sm:p-4 rounded-tr-lg">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Example row (hidden by default, for demonstration) -->
-                                <!--
-                                <tr class="table-row">
-                                    <td class="p-4">Example Corp</td>
-                                    <td class="p-4">2024-07-10</td>
-                                    <td class="p-4 text-yellow-600">Pending</td>
-                                    <td class="p-4"><button class="text-blue-500 hover:underline">View Details</button></td>
-                                </tr>
-                                -->
                                 <tr>
                                     <td colspan="4" class="p-4 text-center">No data available</td>
                                 </tr>
@@ -665,33 +672,33 @@
 
             <!-- Scheduled Companies Section -->
             <section id="scheduled-companies-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Scheduled Companies</h3>
-                    <div class="alert-box red mb-6">
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Scheduled Companies</h3>
+                    <div class="alert-box red mb-6 text-sm sm:text-base">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>No Schedule Company Found For Passout Batch 2026-27</span>
                     </div>
 
-                    <h4 class="text-lg font-semibold">Instructions</h4>
-                    <p class="mb-4">Here Are Step-by-Step Instructions You Should Follow If You Are Getting An Error Like No Schedule Company Found For Passout Batch 2026-27.</p>
+                    <h4 class="text-base sm:text-lg font-semibold">Instructions</h4>
+                    <p class="mb-4 text-sm sm:text-base">Here Are Step-by-Step Instructions You Should Follow If You Are Getting An Error Like No Schedule Company Found For Passout Batch 2026-27.</p>
 
-                    <h5 class="text-md font-semibold mb-2">Here Are The Steps</h5>
-                    <ol class="list-decimal list-inside instruction-list">
+                    <h5 class="text-md sm:text-base font-semibold mb-2">Here Are The Steps</h5>
+                    <ol class="list-decimal list-inside instruction-list text-sm sm:text-base">
                         <li>
                             <strong>Step 1: Go To Personal Details Tab</strong>
-                            <p class="ml-6 text-sm">Click on the Avatar icon located at the Top-Right Corner of your portal. You will see the <strong class="text-gray-800">User Profile</strong> option in the popup menu – click on it. Alternatively, open the Navigation Menu, and you will find a tab named <strong class="text-gray-800">Fill Profile</strong>. Both options navigate to the same page. On that page go to the <strong class="text-gray-800">Personal Tab</strong> and click on it.</p>
+                            <p class="ml-6 text-xs sm:text-sm">Click on the Avatar icon located at the Top-Right Corner of your portal. You will see the <strong class="text-gray-800">User Profile</strong> option in the popup menu – click on it. Alternatively, open the Navigation Menu, and you will find a tab named <strong class="text-gray-800">Fill Profile</strong>. Both options navigate to the same page. On that page go to the <strong class="text-gray-800">Personal Tab</strong> and click on it.</p>
                         </li>
                         <li>
                             <strong>Step 2: Check That All Details Are Filled Properly, Especially The Year of Passing and Program/Branch.</strong>
-                            <p class="ml-6 text-sm">After Opening Personal Details, You Must Check That Your <strong class="text-gray-800">Year of Passing</strong> and <strong class="text-gray-800">Program/Branch</strong> Are Filled in Correctly. Also, Make Sure That After Filling in All Details, the Profile Is Saved and Freeze.</p>
+                            <p class="ml-6 text-xs sm:text-sm">After Opening Personal Details, You Must Check That Your <strong class="text-gray-800">Year of Passing</strong> and <strong class="text-gray-800">Program/Branch</strong> Are Filled in Correctly. Also, Make Sure That After Filling in All Details, the Profile Is Saved and Freeze.</p>
                         </li>
                         <li>
                             <strong>Step 3 : Go To TPO Registration Tab</strong>
-                            <p class="ml-6 text-sm">Click on the Navigation icon (Located at the Top-Left Corner – Three Horizontal Lines). After Clicking, You will See a Menu Slide in from the Left. In That Menu, There Is a Tab Named <strong class="text-gray-800">TPO Registration</strong> and click on it.</p>
+                            <p class="ml-6 text-xs sm:text-sm">Click on the Navigation icon (Located at the Top-Left Corner – Three Horizontal Lines). After Clicking, You will See a Menu Slide in from the Left. In That Menu, There Is a Tab Named <strong class="text-gray-8-00">TPO Registration</strong> and click on it.</p>
                         </li>
                         <li>
                             <strong>Step 4:</strong>
-                            <p class="ml-6 text-sm">Register for the Type of Placement Company You Would Like to Apply for in Your Current Academic Year (2025-26).</p>
+                            <p class="ml-6 text-xs sm:text-sm">Register for the Type of Placement Company You Would Like to Apply for in Your Current Academic Year (2025-26).</p>
                         </li>
                     </ol>
                 </div>
@@ -699,76 +706,35 @@
 
             <!-- Fill Profile Section -->
             <section id="fill-profile-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Fill Profile</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <div class="profile-card">
-                            <i class="fas fa-user"></i>
-                            <h4 class="font-medium">Personal Details</h4>
-                            <i class="fas fa-check-circle text-green-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
-                        <div class="profile-card">
-                            <i class="fas fa-graduation-cap"></i>
-                            <h4 class="font-medium">Examination</h4>
-                            <i class="fas fa-check-circle text-green-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
-                        <div class="profile-card">
-                            <i class="fas fa-book-open"></i>
-                            <h4 class="font-medium">Academics</h4>
-                            <i class="fas fa-check-circle text-green-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
-                        <div class="profile-card">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <h4 class="font-medium">Address Details</h4>
-                            <i class="fas fa-check-circle text-green-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
-                        <div class="profile-card">
-                            <i class="fas fa-file-alt"></i>
-                            <h4 class="font-medium">Upload CV</h4>
-                            <i class="fas fa-check-circle text-green-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
-                        <div class="profile-card">
-                            <i class="fas fa-envelope-open-text"></i>
-                            <h4 class="font-medium">Offer Letter</h4>
-                            <i class="fas fa-times-circle text-red-500 status-icon"></i>
-                            <i class="fas fa-plus-circle add-icon"></i>
-                        </div>
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Fill Profile</h3>
+                    <div id="profileCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                        <!-- Profile cards will be dynamically loaded here -->
                     </div>
+                    <button id="addProfileSectionBtn" class="mt-6 px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">
+                        <i class="fas fa-plus mr-2"></i>Add New Profile Section
+                    </button>
                 </div>
             </section>
 
             <!-- Notices Section -->
             <section id="notices-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Notice Board</h3>
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Notice Board</h3>
                     <div class="data-table-container">
                         <table class="w-full text-left data-table">
                             <thead>
                                 <tr class="table-header rounded-t-lg">
-                                    <th class="p-4 rounded-tl-lg">Notice</th>
-                                    <th class="p-4">Program</th>
-                                    <th class="p-4">Year</th>
-                                    <th class="p-4 rounded-tr-lg">Date</th>
+                                    <th class="p-2 sm:p-4 rounded-tl-lg">Notice</th>
+                                    <th class="p-2 sm:p-4">Program</th>
+                                    <th class="p-2 sm:p-4">Year</th>
+                                    <th class="p-2 sm:p-4 rounded-tr-lg">Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td colspan="4" class="p-4 text-center">No data available</td>
                                 </tr>
-                                <!-- Example Notice Row (hidden by default) -->
-                                <!--
-                                <tr class="table-row">
-                                    <td class="p-4">Important Announcement</td>
-                                    <td class="p-4">All Programs</td>
-                                    <td class="p-4">2025</td>
-                                    <td class="p-4">2024-07-18</td>
-                                </tr>
-                                -->
                             </tbody>
                         </table>
                     </div>
@@ -794,8 +760,8 @@
 
             <!-- Question Bank Section -->
             <section id="question-bank-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Question Bank Student</h3>
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Question Bank Student</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div>
                             <label for="companySelect" class="block text-sm font-medium">Choose Company</label>
@@ -830,20 +796,20 @@
                             </select>
                         </div>
                     </div>
-                    <button class="px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">PROCEED</button>
+                    <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">PROCEED</button>
                 </div>
             </section>
 
             <!-- TPO Registration Section -->
             <section id="tpo-registration-content" class="content-section hidden">
-                <div class="card p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold">TPO Registration</h3>
-                        <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200">
+                <div class="card p-4 sm:p-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-between mb-6 space-y-4 sm:space-y-0">
+                        <h3 class="text-lg sm:text-xl font-semibold">TPO Registration</h3>
+                        <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">
                             <i class="fas fa-plus mr-2"></i>NEW TPO REGISTRATION
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         <div class="registration-card">
                             <h3>Placement</h3>
                             <p>Academic Year</p>
@@ -876,35 +842,33 @@
 
             <!-- Application Tracking Section -->
             <section id="application-tracking-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Application Tracking</h3>
-                    <div class="alert-box red mb-4">
+                <div class="card p-4 sm:p-6">
+                    <h3 class="text-lg sm:text-xl font-semibold">Application Tracking</h3>
+                    <div class="alert-box red mb-4 text-sm sm:text-base">
                         <i class="fas fa-exclamation-circle"></i>
                         <span>Please Apply For company</span>
-                        <button class="ml-auto px-3 py-1 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-200">CLOSE</button>
+                        <button class="ml-auto px-3 py-1 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-200 text-xs sm:text-sm">CLOSE</button>
                     </div>
-                    <p>Your application tracking details will appear here once you apply for companies.</p>
-                    <!-- Placeholder for actual tracking content -->
-                </div>
-            </section>
-
-            <!-- Off Campus Job Section -->
-            <section id="off-campus-job-content" class="content-section hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-semibold">Off Campus Job Opportunities</h3>
-                    <p>Details about off-campus job opportunities will be listed here.</p>
-                    <div class="mt-4">
-                        <!-- Example content structure -->
-                        <ul class="list-disc list-inside">
-                            <li>Check regularly for new listings.</li>
-                            <li>Filter by role, location, or company.</li>
-                            <li>Apply directly through the provided links.</li>
-                        </ul>
-                    </div>
+                    <p class="text-sm sm:text-base">Your application tracking details will appear here once you apply for companies.</p>
                 </div>
             </section>
 
         </main>
+    </div>
+
+    <!-- Generic Modal Structure -->
+    <div id="genericModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalBtn">&times;</span>
+            <h3 id="modalTitle" class="text-xl sm:text-2xl font-semibold mb-4"></h3>
+            <div id="modalBody">
+                <!-- Form fields or messages will be inserted here -->
+            </div>
+            <div class="flex justify-end mt-6 space-x-4">
+                <button id="cancelModalBtn" class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-300 text-gray-800 hover:bg-gray-400 transition duration-200 text-sm sm:text-base">Cancel</button>
+                <button id="saveModalBtn" class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Save</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -920,25 +884,90 @@
             const currentSectionTitle = document.getElementById('currentSectionTitle');
             const themeToggle = document.getElementById('themeToggle');
             const body = document.body;
-            const eduplusLogo = document.getElementById('eduplusLogo'); // Get the Eduplus logo div
+            const eduplusLogo = document.getElementById('eduplusLogo');
+
+            // Modal elements
+            const genericModal = document.getElementById('genericModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
+            const saveModalBtn = document.getElementById('saveModalBtn');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            // Profile Management elements
+            const profileCardsContainer = document.getElementById('profileCardsContainer');
+            const addProfileSectionBtn = document.getElementById('addProfileSectionBtn');
+
+            // Company Dashboard elements
+            const companyTableBody = document.getElementById('companyTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const rowsPerPageSelect = document.getElementById('rowsPerPage');
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+
+            // In-memory data for profile sections
+            let profileSectionsData = [
+                { id: 'personal', title: 'Personal Details', icon: 'fas fa-user', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
+                { id: 'examination', title: 'Examination', icon: 'fas fa-graduation-cap', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
+                { id: 'academics', title: 'Academics', icon: 'fas fa-book-open', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
+                { id: 'address', title: 'Address Details', icon: 'fas fa-map-marker-alt', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
+                { id: 'upload-cv', title: 'Upload CV', icon: 'fas fa-file-alt', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
+                { id: 'offer-letter', title: 'Offer Letter', icon: 'fas fa-envelope-open-text', status: 'pending', statusIcon: 'fas fa-times-circle', statusColor: 'text-red-500' },
+            ];
+
+            // In-memory data for company dashboard
+            const allCompanyData = [
+                { company: 'Tech Solutions Inc.', info: 'Software Development and Cloud Solutions', criteria: 'CGPA > 7.0', procedure: 'Online Test, Technical Interview, HR Interview', regStart: '2024-07-01 09:00', regEnd: '2024-07-15 17:00', maxPackage: '12 LPA', minPackage: '8 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Global Innovations', info: 'Data Analytics and Business Intelligence', criteria: 'CGPA > 7.5', procedure: 'Case Study, Group Discussion, Interview', regStart: '2024-07-05 10:00', regEnd: '2024-07-20 18:00', maxPackage: '15 LPA', minPackage: '10 LPA', placementType: 'Internship', academicYear: '2025' },
+                { company: 'Creative Minds Ltd.', info: 'UI/UX Design and Product Management', criteria: 'Portfolio Review', procedure: 'Design Challenge, Technical Interview, HR Interview', regStart: '2024-07-10 11:00', regEnd: '2024-07-25 16:00', maxPackage: '9 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
+                { company: 'FutureTech Solutions', info: 'Cloud Engineering and DevOps Practices', criteria: 'CGPA > 6.5', procedure: 'Technical Interview, System Design Round', regStart: '2024-07-12 10:30', regEnd: '2024-07-28 17:30', maxPackage: '14 LPA', minPackage: '9 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Innovate Systems', info: 'Cybersecurity Solutions and Network Security', criteria: 'Certifications', procedure: 'Practical Test, Technical Interview, HR Interview', regStart: '2024-07-15 09:30', regEnd: '2024-07-30 16:00', maxPackage: '13 LPA', minPackage: '8.5 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Data Insights Corp.', info: 'Big Data Solutions', criteria: 'CGPA > 7.2', procedure: 'Coding Test, Technical Interview', regStart: '2024-08-01 09:00', regEnd: '2024-08-15 17:00', maxPackage: '16 LPA', minPackage: '11 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Web Wizards', info: 'Frontend and Backend Web Development', criteria: 'Proficiency in JS frameworks', procedure: 'Live Coding, Project Discussion', regStart: '2024-08-05 10:00', regEnd: '2024-08-20 18:00', maxPackage: '11 LPA', minPackage: '7 LPA', placementType: 'Internship', academicYear: '2026' },
+                { company: 'SecureNet Solutions', info: 'Network Security and Penetration Testing', criteria: 'Relevant Certifications', procedure: 'Practical Lab Test, Interview', regStart: '2024-08-10 11:00', regEnd: '2024-08-25 16:00', maxPackage: '14 LPA', minPackage: '9.5 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'AI Innovators', info: 'Machine Learning and AI Research', criteria: 'Strong Math background', procedure: 'Research Paper Presentation, Technical Interview', regStart: '2024-08-12 10:30', regEnd: '2024-08-28 17:30', maxPackage: '18 LPA', minPackage: '13 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Cloud Builders', info: 'Cloud Infrastructure and Architecture', criteria: 'AWS/Azure Certifications', procedure: 'System Design Interview, Behavioral Interview', regStart: '2024-08-15 09:30', regEnd: '2024-08-30 16:00', maxPackage: '17 LPA', minPackage: '12 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'Mobile Masters', info: 'iOS and Android App Development', criteria: 'Portfolio of apps', procedure: 'App Demo, Technical Interview', regStart: '2024-09-01 09:00', regEnd: '2024-09-15 17:00', maxPackage: '10 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
+                { company: 'Game Changers Studio', info: 'Game Design and Development', criteria: 'Gaming projects', procedure: 'Game Demo, Creative Interview', regStart: '2024-09-05 10:00', regEnd: '2024-09-20 18:00', maxPackage: '11 LPA', minPackage: '7 LPA', placementType: 'Internship', academicYear: '2026' },
+                { company: 'FinTech Solutions', info: 'Financial Technology Development', criteria: 'Strong analytical skills', procedure: 'Quant Test, Technical Interview', regStart: '2024-09-10 11:00', regEnd: '2024-09-25 16:00', maxPackage: '16 LPA', minPackage: '10 LPA', placementType: 'Full-time', academicYear: '2025' },
+                { company: 'EduTech Innovations', info: 'Educational Software Development', criteria: 'Passion for education', procedure: 'Product Ideation, Technical Interview', regStart: '2024-09-12 10:30', regEnd: '2024-09-28 17:30', maxPackage: '9 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
+                { company: 'HealthTech Connect', info: 'Healthcare IT Solutions', criteria: 'Understanding of healthcare domain', procedure: 'Case Study, Interview', regStart: '2024-09-15 09:30', regEnd: '2024-09-30 16:00', maxPackage: '13 LPA', minPackage: '8 LPA', placementType: 'Full-time', academicYear: '2025' }
+            ];
+            let filteredCompanyData = [...allCompanyData]; // Data currently being displayed/filtered
+            let currentPage = 1;
+            let rowsPerPage = parseInt(rowsPerPageSelect.value);
 
             // Function to toggle sidebar state
             const toggleSidebar = () => {
-                sidebar.classList.toggle('sidebar-collapsed');
-                sidebarSpans.forEach(span => span.classList.toggle('hidden'));
-                h1Element.classList.toggle('hidden');
-                imgElement.classList.toggle('mr-3');
-                imgElement.classList.toggle('mr-0'); // Adjust margin for collapsed state
-                sidebarIcons.forEach(icon => {
-                    // Adjust padding for icons when text is hidden
-                    if (sidebar.classList.contains('sidebar-collapsed')) {
-                        icon.parentElement.style.justifyContent = 'center';
-                        icon.parentElement.style.padding = '0.75rem 0'; /* Adjusted padding */
-                    } else {
+                // For larger screens, toggle the 'sidebar-collapsed' class
+                if (window.innerWidth > 768) {
+                    sidebar.classList.toggle('sidebar-collapsed');
+                    sidebarSpans.forEach(span => span.classList.toggle('hidden'));
+                    h1Element.classList.toggle('hidden');
+                    imgElement.classList.toggle('mr-3');
+                    imgElement.classList.toggle('mr-0');
+                    sidebarIcons.forEach(icon => {
+                        if (sidebar.classList.contains('sidebar-collapsed')) {
+                            icon.parentElement.style.justifyContent = 'center';
+                            icon.parentElement.style.padding = '0.75rem 0';
+                        } else {
+                            icon.parentElement.style.justifyContent = 'flex-start';
+                            icon.parentElement.style.padding = '1rem 1.5rem';
+                        }
+                    });
+                } else { // For smaller screens, toggle 'sidebar-open' class
+                    sidebar.classList.toggle('sidebar-open');
+                    // Ensure text and logo are visible when sidebar is open on small screens
+                    sidebarSpans.forEach(span => span.classList.remove('hidden'));
+                    h1Element.classList.remove('hidden');
+                    imgElement.classList.add('mr-3');
+                    imgElement.classList.remove('mr-0');
+                    sidebarIcons.forEach(icon => {
                         icon.parentElement.style.justifyContent = 'flex-start';
                         icon.parentElement.style.padding = '1rem 1.5rem';
-                    }
-                });
+                    });
+                }
             };
 
             // Event listener for sidebar toggle button
@@ -946,6 +975,8 @@
 
             // Function to show a specific content section
             const showSection = (sectionId) => {
+                closeModal(); // Close any open modal when changing sections
+
                 contentSections.forEach(section => {
                     section.classList.add('hidden');
                 });
@@ -968,6 +999,20 @@
                 const correspondingSidebarItem = document.querySelector(`.sidebar-item[data-section="${sectionId}"]`);
                 if (correspondingSidebarItem) {
                     correspondingSidebarItem.classList.add('active');
+                }
+
+                // If navigating to fill-profile, re-render cards
+                if (sectionId === 'fill-profile') {
+                    renderProfileCards();
+                }
+                 // If navigating to company-dashboard, re-render table
+                if (sectionId === 'company-dashboard') {
+                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+                }
+
+                // Close sidebar on small screens after selecting a section
+                if (window.innerWidth <= 768 && sidebar.classList.contains('sidebar-open')) {
+                    sidebar.classList.remove('sidebar-open');
                 }
             };
 
@@ -1013,42 +1058,293 @@
                 applyTheme(false); // Default to light mode if no preference or 'false'
             }
 
-            // Basic search functionality (client-side for demonstration) - applies only to main dashboard table
-            const searchInput = document.getElementById('searchInput');
-            const companyDashboardTableRows = document.querySelectorAll('#company-dashboard-content .data-table tbody tr');
+            /* Profile Management Functions */
 
-            if (searchInput) {
-                searchInput.addEventListener('keyup', (event) => {
-                    const searchTerm = event.target.value.toLowerCase();
-                    companyDashboardTableRows.forEach(row => {
-                        const rowText = row.textContent.toLowerCase();
-                        if (rowText.includes(searchTerm)) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
+            // Function to render profile cards
+            const renderProfileCards = () => {
+                profileCardsContainer.innerHTML = ''; // Clear existing cards
+                profileSectionsData.forEach(section => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.dataset.id = section.id; // Store ID for actions
+
+                    card.innerHTML = `
+                        <i class="${section.icon}"></i>
+                        <h4 class="font-medium">${section.title}</h4>
+                        <i class="${section.statusIcon} ${section.statusColor} status-icon"></i>
+                        <div class="action-icons">
+                            <i class="fas fa-edit edit-icon" data-id="${section.id}"></i>
+                            <i class="fas fa-trash-alt delete-icon" data-id="${section.id}"></i>
+                        </div>
+                    `;
+                    profileCardsContainer.appendChild(card);
+                });
+
+                // Add event listeners for edit and delete icons after rendering
+                document.querySelectorAll('.edit-icon').forEach(icon => {
+                    icon.addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent card click if it had one
+                        const id = event.target.dataset.id;
+                        openProfileModal(id);
                     });
                 });
-            }
 
-
-            // Rows per page functionality (client-side for demonstration) - applies only to main dashboard table
-            const rowsPerPageSelect = document.getElementById('rowsPerPage');
-            if (rowsPerPageSelect) {
-                rowsPerPageSelect.addEventListener('change', (event) => {
-                    const rowsPerPage = parseInt(event.target.value);
-                    companyDashboardTableRows.forEach((row, index) => {
-                        if (index < rowsPerPage) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
+                document.querySelectorAll('.delete-icon').forEach(icon => {
+                    icon.addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent card click if it had one
+                        const id = event.target.dataset.id;
+                        deleteProfileSection(id);
                     });
                 });
-                // Initial call to set rows per page based on default selection
-                rowsPerPageSelect.dispatchEvent(new Event('change'));
-            }
+            };
 
+            // Open modal for adding/editing profile section
+            const openProfileModal = (id = null) => {
+                genericModal.classList.remove('hidden');
+                let section = { id: '', title: '', icon: '', status: 'pending' }; // Default for new
+                let isEditing = false;
+
+                if (id) {
+                    isEditing = true;
+                    section = profileSectionsData.find(s => s.id === id);
+                    modalTitle.textContent = `Edit ${section.title}`;
+                } else {
+                    modalTitle.textContent = 'Add New Profile Section';
+                }
+
+                modalBody.innerHTML = `
+                    <div class="mb-4">
+                        <label for="sectionTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Section Title</label>
+                        <input type="text" id="sectionTitle" class="mt-1 block w-full search-input" value="${section.title}" placeholder="e.g., Certificates">
+                    </div>
+                    <div class="mb-4">
+                        <label for="sectionIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon Class (Font Awesome)</label>
+                        <input type="text" id="sectionIcon" class="mt-1 block w-full search-input" value="${section.icon}" placeholder="e.g., fas fa-award">
+                        <p class="text-xs text-gray-500 mt-1">Find icons at <a href="https://fontawesome.com/icons" target="_blank" class="text-blue-500 hover:underline">fontawesome.com/icons</a></p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="sectionStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <select id="sectionStatus" class="mt-1 block w-full select-input">
+                            <option value="completed" ${section.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            <option value="pending" ${section.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        </select>
+                    </div>
+                `;
+
+                // Store current ID in save button for reference
+                saveModalBtn.dataset.id = id;
+                saveModalBtn.dataset.isEditing = isEditing;
+            };
+
+            // Close modal
+            const closeModal = () => {
+                genericModal.classList.add('hidden');
+            };
+
+            // Save profile section
+            const saveProfileSection = () => {
+                const id = saveModalBtn.dataset.id;
+                const isEditing = saveModalBtn.dataset.isEditing === 'true';
+                const title = document.getElementById('sectionTitle').value.trim();
+                const icon = document.getElementById('sectionIcon').value.trim();
+                const status = document.getElementById('sectionStatus').value;
+
+                if (!title || !icon) {
+                    // Replaced alert with a custom message in the modal body for better UX
+                    modalBody.insertAdjacentHTML('afterbegin', '<p class="text-red-500 text-sm mb-2">Please fill in all fields.</p>');
+                    return;
+                }
+
+                const statusIcon = status === 'completed' ? 'fas fa-check-circle' : 'fas fa-times-circle';
+                const statusColor = status === 'completed' ? 'text-green-500' : 'text-red-500';
+
+                if (isEditing) {
+                    // Update existing section
+                    const index = profileSectionsData.findIndex(s => s.id === id);
+                    if (index !== -1) {
+                        profileSectionsData[index] = { ...profileSectionsData[index], title, icon, status, statusIcon, statusColor };
+                    }
+                } else {
+                    // Add new section
+                    const newId = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''); // Simple ID generation
+                    profileSectionsData.push({ id: newId, title, icon, status, statusIcon, statusColor });
+                }
+
+                renderProfileCards();
+                closeModal();
+            };
+
+            // Delete profile section
+            const deleteProfileSection = (id) => {
+                // Replaced confirm with a custom modal for better UX
+                openConfirmationModal('Delete Profile Section', 'Are you sure you want to delete this profile section?', () => {
+                    profileSectionsData = profileSectionsData.filter(s => s.id !== id);
+                    renderProfileCards();
+                    closeModal(); // Close confirmation modal after action
+                });
+            };
+
+            // Function to open a generic confirmation modal
+            const openConfirmationModal = (title, message, onConfirm) => {
+                genericModal.classList.remove('hidden');
+                modalTitle.textContent = title;
+                modalBody.innerHTML = `<p class="text-base">${message}</p>`;
+                saveModalBtn.textContent = 'Confirm';
+                saveModalBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                saveModalBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+
+                // Temporarily remove existing save listener to prevent conflicts
+                saveModalBtn.removeEventListener('click', saveProfileSection);
+                saveModalBtn.removeEventListener('click', handleSaveConfirmation); // Remove any previous confirmation handler
+
+                const handleSaveConfirmation = () => {
+                    onConfirm();
+                    // Restore original save button state
+                    saveModalBtn.textContent = 'Save';
+                    saveModalBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    saveModalBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                    saveModalBtn.removeEventListener('click', handleSaveConfirmation); // Clean up
+                    saveModalBtn.addEventListener('click', saveProfileSection); // Re-add original
+                };
+                saveModalBtn.addEventListener('click', handleSaveConfirmation);
+            };
+
+
+            // Event Listeners for Modal
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelModalBtn.addEventListener('click', closeModal);
+            saveModalBtn.addEventListener('click', saveProfileSection); // Default save handler
+            addProfileSectionBtn.addEventListener('click', () => openProfileModal(null));
+
+            /* Company Dashboard Pagination and Search Functions */
+
+            // Function to display table data for the current page
+            const displayCompanyTable = (data, page, rows) => {
+                companyTableBody.innerHTML = ''; // Clear current table
+                const start = (page - 1) * rows;
+                const end = start + rows;
+                const paginatedItems = data.slice(start, end);
+
+                if (paginatedItems.length === 0) {
+                    companyTableBody.innerHTML = `<tr><td colspan="10" class="p-4 text-center">No companies found.</td></tr>`;
+                    pageNumbersContainer.innerHTML = '';
+                    prevPageBtn.disabled = true;
+                    nextPageBtn.disabled = true;
+                    return;
+                }
+
+                paginatedItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row';
+                    row.innerHTML = `
+                        <td class="p-2 sm:p-4">${item.company}</td>
+                        <td class="p-2 sm:p-4">${item.info}</td>
+                        <td class="p-2 sm:p-4">${item.criteria}</td>
+                        <td class="p-2 sm:p-4">${item.procedure}</td>
+                        <td class="p-2 sm:p-4">${item.regStart}</td>
+                        <td class="p-2 sm:p-4">${item.regEnd}</td>
+                        <td class="p-2 sm:p-4">${item.maxPackage}</td>
+                        <td class="p-2 sm:p-4">${item.minPackage}</td>
+                        <td class="p-2 sm:p-4">${item.placementType}</td>
+                        <td class="p-2 sm:p-4">${item.academicYear}</td>
+                    `;
+                    companyTableBody.appendChild(row);
+                });
+                setupPagination(data.length, page, rows);
+            };
+
+            // Function to set up pagination controls
+            const setupPagination = (totalItems, page, rows) => {
+                pageNumbersContainer.innerHTML = '';
+                const pageCount = Math.ceil(totalItems / rows);
+
+                for (let i = 1; i <= pageCount; i++) {
+                    const btn = document.createElement('button');
+                    btn.classList.add('pagination-button', 'px-3', 'py-1', 'rounded-md', 'text-sm');
+                    btn.textContent = i;
+                    if (i === page) {
+                        btn.classList.add('active');
+                    }
+                    btn.addEventListener('click', () => {
+                        currentPage = i;
+                        displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+                    });
+                    pageNumbersContainer.appendChild(btn);
+                }
+
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === pageCount;
+            };
+
+            // Event Listeners for Pagination
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+                }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                const pageCount = Math.ceil(filteredCompanyData.length / rowsPerPage);
+                if (currentPage < pageCount) {
+                    currentPage++;
+                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+                }
+            });
+
+            rowsPerPageSelect.addEventListener('change', (event) => {
+                rowsPerPage = parseInt(event.target.value);
+                currentPage = 1; // Reset to first page when rows per page changes
+                displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+            });
+
+            // Search functionality
+            searchInput.addEventListener('keyup', (event) => {
+                const searchTerm = event.target.value.toLowerCase();
+                filteredCompanyData = allCompanyData.filter(item =>
+                    Object.values(item).some(value =>
+                        String(value).toLowerCase().includes(searchTerm)
+                    )
+                );
+                currentPage = 1; // Reset to first page on new search
+                displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
+            });
+
+            // Handle window resize for sidebar behavior
+            const handleResize = () => {
+                if (window.innerWidth > 768) {
+                    // On larger screens, ensure sidebar is expanded by default (not collapsed)
+                    sidebar.classList.remove('sidebar-open'); // Remove mobile open state
+                    sidebar.classList.remove('sidebar-collapsed'); // Ensure it's not collapsed by default
+                    sidebarSpans.forEach(span => span.classList.remove('hidden'));
+                    h1Element.classList.remove('hidden');
+                    imgElement.classList.add('mr-3');
+                    imgElement.classList.remove('mr-0');
+                    sidebarIcons.forEach(icon => {
+                        icon.parentElement.style.justifyContent = 'flex-start';
+                        icon.parentElement.style.padding = '1rem 1.5rem';
+                    });
+                    sidebarToggle.classList.add('hidden'); // Hide toggle button on large screens
+                } else {
+                    // On smaller screens, hide sidebar by default and show toggle
+                    sidebar.classList.remove('sidebar-open'); // Ensure it's closed
+                    sidebar.classList.remove('sidebar-collapsed'); // Remove collapsed state
+                    sidebarSpans.forEach(span => span.classList.add('hidden'));
+                    h1Element.classList.add('hidden');
+                    imgElement.classList.remove('mr-3');
+                    imgElement.classList.add('mr-0');
+                    sidebarIcons.forEach(icon => {
+                        icon.parentElement.style.justifyContent = 'center';
+                        icon.parentElement.style.padding = '0.75rem 0';
+                    });
+                    sidebarToggle.classList.remove('hidden'); // Show toggle button on small screens
+                }
+            };
+
+            window.addEventListener('resize', handleResize);
+
+            // Initial call to set up responsiveness on load
+            handleResize();
             // Initially show the Home Page
             showSection('home-page');
         });
