@@ -60,90 +60,167 @@
             background-color: var(--bg-color);
             color: var(--text-color); /* Apply text color variable */
             display: flex; /* Make body a flex container */
+            flex-direction: column; /* Stack header and main content vertically on mobile */
             height: 100vh; /* Ensure body takes full viewport height */
             overflow: hidden; /* Prevent body from scrolling, let children handle it */
         }
+
+        /* Sidebar specific styles */
         .sidebar {
-            width: 300px; /* Default width for larger screens */
+            position: fixed; /* Fixed position for overlay on mobile */
+            top: 0;
+            left: -280px; /* Start off-screen, matching width */
+            width: 280px; /* Fixed width for mobile sidebar */
+            height: 100%;
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: width 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-            flex-shrink: 0; /* Prevent sidebar from shrinking */
-            height: 100%; /* Make sidebar fill 100% height of its flex parent (body) */
-            overflow-y: auto; /* Allow sidebar content to scroll if it overflows */
+            transition: left 0.3s ease-in-out; /* Smooth slide-in/out */
+            z-index: 100; /* High z-index to be on top */
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
         }
-        /* Responsive sidebar adjustments */
-        @media (max-width: 768px) { /* On medium screens and smaller */
+        .sidebar.open {
+            left: 0; /* Slide in */
+        }
+        /* Overlay for when sidebar is open */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 90;
+            display: none; /* Hidden by default */
+        }
+        .sidebar.open + .sidebar-overlay {
+            display: block; /* Show when sidebar is open */
+        }
+
+        /* Desktop sidebar styles */
+        @media (min-width: 768px) { /* On medium screens and larger */
+            body {
+                flex-direction: row; /* Sidebar and main content side-by-side */
+            }
             .sidebar {
-                width: 0; /* Hidden by default on small screens */
-                position: absolute;
-                z-index: 50; /* Ensure it's above other content when open */
-                left: 0;
-                top: 0;
+                position: static; /* Not fixed on desktop */
+                width: 280px; /* Default desktop width (increased for text) */
                 height: 100%;
-                overflow-x: hidden; /* Hide horizontal scrollbar when collapsed */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                transition: width 0.3s ease;
+                flex-shrink: 0;
+                left: 0; /* Reset left property */
+                padding: 1.5rem; /* Adjust padding for desktop */
             }
-            .sidebar.sidebar-open {
-                width: 250px; /* Open width on small screens */
+            .sidebar.collapsed {
+                width: 90px; /* Collapsed width */
             }
-            .sidebar-toggle-container {
-                display: block; /* Show toggle button on small screens */
+            .sidebar-overlay {
+                display: none !important; /* Always hide overlay on desktop */
             }
             .main-content-area {
-                margin-left: 0; /* No margin when sidebar is hidden */
+                margin-left: 0; /* No margin needed, flex handles it */
             }
         }
 
-        .sidebar-collapsed { /* This class will now be used for the visual collapsed state on larger screens */
-            width: 90px;
-        }
         .sidebar-item {
             display: flex;
             align-items: center;
-            padding: 1rem 1.5rem; /* Default padding for expanded state */
+            padding: 0.75rem 1rem;
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease;
             border-radius: 0.5rem;
-            margin-bottom: 0.5rem; /* Consistent vertical spacing for all items */
-        }
-        .sidebar-item:first-child { /* Apply top margin only to the first item for spacing from logo */
-            margin-top: 1rem;
+            margin-bottom: 0.5rem;
         }
         .sidebar-item:hover {
             background-color: var(--sidebar-hover-bg);
-            color: var(--sidebar-text); /* Keep text color consistent on hover */
+            color: var(--sidebar-text);
         }
         .sidebar-item.active {
             background-color: var(--sidebar-active-bg);
-            color: var(--sidebar-text); /* Keep text color consistent on active */
+            color: var(--sidebar-text);
             font-weight: 600;
         }
         .sidebar-item i {
-            margin-right: 1rem; /* Default margin for icon when text is present */
+            margin-right: 1rem;
             font-size: 1.25rem;
         }
         .sidebar-item span {
-            white-space: nowrap;
-            overflow: hidden;
+            white-space: nowrap; /* Prevent text wrapping */
+            display: block; /* Default to block for text visibility */
+            /* Removed overflow: hidden and text-overflow: ellipsis from here */
+        }
+
+        /* Collapsed sidebar adjustments for desktop */
+        .sidebar.collapsed .sidebar-item {
+            justify-content: center;
+            padding: 0.75rem 0.5rem;
+        }
+        .sidebar.collapsed .sidebar-item i {
+            margin-right: 0;
+        }
+        .sidebar.collapsed .sidebar-item span {
+            display: none; /* Hide text when collapsed */
+            overflow: hidden; /* Apply overflow and ellipsis only when collapsed */
             text-overflow: ellipsis;
+        }
+        .sidebar.collapsed .sidebar-header h1 {
+            display: none;
+        }
+        .sidebar.collapsed .sidebar-header img {
+            margin-right: 0 !important;
+        }
+        .sidebar.collapsed .sidebar-footer .sidebar-item span {
+            display: none;
+        }
+        .sidebar.collapsed .sidebar-footer .sidebar-item {
+            justify-content: center;
+        }
+
+        /* Main content area */
+        .main-content-area {
+            flex-grow: 1; /* Take remaining space */
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Allow main content to scroll */
         }
         .header {
             background-color: var(--header-bg);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0; /* Prevent header from shrinking */
-            color: var(--text-color); /* Apply text color variable */
+            flex-shrink: 0;
+            color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 1rem; /* Default padding for mobile */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
         }
+        @media (min-width: 640px) { /* Adjust header for sm breakpoint */
+            .header {
+                padding: 1.5rem;
+                flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+            }
+        }
+
         .card {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: background-color 0.3s ease;
+            padding: 1rem; /* Default padding for mobile */
         }
+        @media (min-width: 640px) {
+            .card {
+                padding: 1.5rem; /* Adjust padding for sm breakpoint */
+            }
+        }
+
         .table-header {
             background-color: var(--table-header-bg);
-            color: var(--text-color); /* Apply text color variable */
+            color: var(--text-color);
             font-weight: 600;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
@@ -161,38 +238,51 @@
             padding: 0.75rem 1rem;
             width: 100%;
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
-            background-color: var(--card-bg); /* Use card background for inputs */
-            color: var(--text-color); /* Use text color for input text */
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
         .search-input:focus, .select-input:focus {
-            border-color: #63b3ed; /* Keep focus color consistent */
+            border-color: #63b3ed;
             box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5);
             outline: none;
         }
         .pagination-button {
-            background-color: var(--table-header-bg); /* Use a neutral background */
-            color: var(--text-color); /* Use text color */
-            padding: 0.5rem 1rem;
+            background-color: var(--table-header-bg);
+            color: var(--text-color);
+            padding: 0.5rem 0.75rem; /* Smaller padding for mobile */
             border-radius: 0.5rem;
             transition: background-color 0.2s ease, color 0.2s ease;
+            font-size: 0.875rem; /* Smaller font for mobile */
+        }
+        @media (min-width: 640px) {
+            .pagination-button {
+                padding: 0.5rem 1rem; /* Larger padding for sm breakpoint */
+                font-size: 1rem;
+            }
         }
         .pagination-button:hover {
-            background-color: var(--sidebar-hover-bg); /* Use sidebar hover for consistency */
+            background-color: var(--sidebar-hover-bg);
         }
         .pagination-button.active {
-            background-color: var(--sidebar-active-bg); /* Use sidebar active for consistency */
+            background-color: var(--sidebar-active-bg);
             color: #ffffff;
         }
         .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Default blue gradient */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem;
+            padding: 1rem; /* Smaller padding for mobile */
             border-radius: 0.75rem;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 120px;
+            min-height: 100px; /* Smaller min-height for mobile */
+        }
+        @media (min-width: 640px) {
+            .metric-card {
+                padding: 1.5rem;
+                min-height: 120px;
+            }
         }
         .metric-card.green {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
@@ -204,13 +294,23 @@
             background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
         }
         .metric-value {
-            font-size: 2.5rem;
+            font-size: 2rem; /* Smaller font for mobile */
             font-weight: 700;
             line-height: 1;
         }
+        @media (min-width: 640px) {
+            .metric-value {
+                font-size: 2.5rem;
+            }
+        }
         .metric-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller font for mobile */
             opacity: 0.9;
+        }
+        @media (min-width: 640px) {
+            .metric-label {
+                font-size: 0.9rem;
+            }
         }
         .toggle-button {
             background-color: var(--toggle-button-bg);
@@ -230,68 +330,96 @@
         }
         .data-table {
             width: 100%; /* Make table take full width of its container */
-            min-width: 900px; /* Ensure a minimum width for the table to prevent squishing */
+            min-width: 700px; /* Ensure a minimum width for the table to prevent squishing */
             table-layout: auto; /* Allow columns to size based on content, but with min-width */
         }
         .data-table th, .data-table td {
-            padding: 0.75rem;
+            padding: 0.5rem; /* Smaller padding for mobile */
             word-wrap: break-word;
             color: var(--text-color);
-            min-width: 80px; /* Minimum width for table cells */
+            min-width: 60px; /* Minimum width for table cells */
+            font-size: 0.875rem; /* Smaller font for mobile */
         }
-        /* Remove specific column width adjustments, let table-layout: auto handle it */
-        .data-table th:nth-child(1), .data-table td:nth-child(1) { min-width: 120px; } /* Company */
-        .data-table th:nth-child(2), .data-table td:nth-child(2) { min-width: 150px; } /* Company Info */
-        .data-table th:nth-child(3), .data-table td:nth-child(3) { min-width: 100px; } /* Criteria */
-        .data-table th:nth-child(4), .data-table td:nth-child(4) { min-width: 150px; } /* Selection Procedure */
-        .data-table th:nth-child(5), .data-table td:nth-child(5) { min-width: 120px; } /* Reg Start Time */
-        .data-table th:nth-child(6), .data-table td:nth-child(6) { min-width: 120px; } /* Reg End Time */
-        .data-table th:nth-child(7), .data-table td:nth-child(7) { min-width: 80px; }  /* Max Package */
-        .data-table th:nth-child(8), .data-table td:nth-child(8) { min-width: 80px; }  /* Min Package */
-        .data-table th:nth-child(9), .data-table td:nth-child(9) { min-width: 100px; } /* Placement Type */
-        .data-table th:nth-child(10), .data-table td:nth-child(10) { min-width: 100px; } /* Academic Year */
+        @media (min-width: 640px) {
+            .data-table th, .data-table td {
+                padding: 0.75rem;
+                min-width: 80px;
+                font-size: 1rem;
+            }
+        }
 
         .profile-card {
             background-color: var(--card-bg);
             border-radius: 0.75rem;
             border: 1px solid var(--border-color);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            padding: 1.5rem;
+            padding: 1rem; /* Smaller padding for mobile */
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 150px;
+            min-height: 120px; /* Smaller min-height for mobile */
             position: relative;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        @media (min-width: 640px) {
+            .profile-card {
+                padding: 1.5rem;
+                min-height: 150px;
+            }
         }
         .profile-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
         }
         .profile-card i {
-            font-size: 3rem;
+            font-size: 2.5rem; /* Smaller font for mobile */
             color: var(--profile-icon-color);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        @media (min-width: 640px) {
+            .profile-card i {
+                font-size: 3rem;
+                margin-bottom: 0.75rem;
+            }
         }
         .profile-card .status-icon {
             position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            font-size: 1.5rem;
+            top: 0.5rem;
+            left: 0.5rem;
+            font-size: 1.25rem; /* Smaller font for mobile */
+        }
+        @media (min-width: 640px) {
+            .profile-card .status-icon {
+                top: 0.75rem;
+                left: 0.75rem;
+                font-size: 1.5rem;
+            }
         }
         .profile-card .action-icons {
             position: absolute;
-            bottom: 0.75rem;
-            right: 0.75rem;
+            bottom: 0.5rem;
+            right: 0.5rem;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem; /* Smaller gap for mobile */
+        }
+        @media (min-width: 640px) {
+            .profile-card .action-icons {
+                bottom: 0.75rem;
+                right: 0.75rem;
+                gap: 0.5rem;
+            }
         }
         .profile-card .action-icons i {
-            font-size: 1.25rem;
+            font-size: 1rem; /* Smaller font for mobile */
             cursor: pointer;
             margin: 0;
+        }
+        @media (min-width: 640px) {
+            .profile-card .action-icons i {
+                font-size: 1.25rem;
+            }
         }
         .profile-card .action-icons .edit-icon {
             color: #2563eb;
@@ -300,12 +428,19 @@
             color: #ef4444;
         }
         .alert-box {
-            padding: 1rem;
+            padding: 0.75rem; /* Smaller padding for mobile */
             border-radius: 0.5rem;
             display: flex;
             align-items: center;
             font-weight: 500;
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            font-size: 0.875rem; /* Smaller font for mobile */
+        }
+        @media (min-width: 640px) {
+            .alert-box {
+                padding: 1rem;
+                font-size: 1rem;
+            }
         }
         .alert-box.red {
             background-color: #fee2e2;
@@ -318,11 +453,24 @@
             border: 1px solid #2563eb;
         }
         .alert-box i {
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
+            margin-right: 0.5rem; /* Smaller margin for mobile */
+            font-size: 1rem; /* Smaller font for mobile */
+        }
+        @media (min-width: 640px) {
+            .alert-box i {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
         }
         .instruction-list li {
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem; /* Smaller margin for mobile */
+            font-size: 0.875rem; /* Smaller font for mobile */
+        }
+        @media (min-width: 640px) {
+            .instruction-list li {
+                margin-bottom: 0.75rem;
+                font-size: 1rem;
+            }
         }
         .instruction-list strong {
             color: var(--text-color);
@@ -332,19 +480,21 @@
             border-radius: 0.75rem;
             border: 1px solid var(--border-color);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            padding: 1.5rem;
+            padding: 1rem; /* Smaller padding for mobile */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 120px;
+            min-height: 100px; /* Smaller min-height for mobile */
             text-align: center;
             position: relative;
             overflow: hidden;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
         }
-        .registration-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        @media (min-width: 640px) {
+            .registration-card {
+                padding: 1.5rem;
+                min-height: 120px;
+            }
         }
         .registration-card::before {
             content: "\f15c";
@@ -353,38 +503,38 @@
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            font-size: 2rem;
+            font-size: 1.5rem; /* Smaller font for mobile */
             color: var(--border-color);
             opacity: 0.5;
             transition: color 0.3s ease;
         }
+        @media (min-width: 640px) {
+            .registration-card::before {
+                top: 0.75rem;
+                right: 0.75rem;
+                font-size: 2rem;
+            }
+        }
         .registration-card h3 {
-            font-size: 1.25rem;
+            font-size: 1.125rem; /* Smaller font for mobile */
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             color: var(--text-color);
+        }
+        @media (min-width: 640px) {
+            .registration-card h3 {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
         }
         .registration-card p {
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Smaller font for mobile */
             color: var(--text-color);
         }
-        /* Specific adjustments for collapsed sidebar items */
-        .sidebar-collapsed .sidebar-item {
-            padding: 0.75rem;
-            justify-content: center;
-            margin: 0.5rem auto;
-            width: fit-content;
-            min-width: 40px;
-        }
-        .sidebar-collapsed .sidebar-item i {
-            margin-right: 0;
-        }
-        .sidebar-collapsed .sidebar-item span {
-            display: none;
-        }
-        /* Ensure the active state capsule is also centered and sized correctly */
-        .sidebar-collapsed .sidebar-item.active {
-            /* No specific margin-top needed here if general margin:auto handles centering */
+        @media (min-width: 640px) {
+            .registration-card p {
+                font-size: 0.9rem;
+            }
         }
 
         /* Modal Styles */
@@ -407,24 +557,37 @@
         .modal-content {
             background-color: var(--card-bg);
             margin: auto;
-            padding: 2rem;
+            padding: 1.5rem; /* Smaller padding for mobile */
             border-radius: 0.75rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
+            width: 95%; /* Wider for mobile */
+            max-width: 450px; /* Max width for larger screens */
             position: relative;
             color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+        @media (min-width: 640px) {
+            .modal-content {
+                padding: 2rem;
+                max-width: 500px;
+            }
+        }
         .close-button {
             color: var(--text-color);
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            font-size: 1.5rem;
+            top: 0.75rem; /* Smaller top/right for mobile */
+            right: 0.75rem;
+            font-size: 1.25rem; /* Smaller font for mobile */
             font-weight: bold;
             cursor: pointer;
             transition: color 0.2s ease;
+        }
+        @media (min-width: 640px) {
+            .close-button {
+                top: 1rem;
+                right: 1rem;
+                font-size: 1.5rem;
+            }
         }
         .close-button:hover,
         .close-button:focus {
@@ -436,14 +599,19 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar flex flex-col p-4">
-        <div class="flex items-center justify-between mb-10 px-2">
+    <!-- Sidebar (Mobile Overlay / Desktop Static) -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header flex items-center justify-between mb-8 px-2">
             <div id="eduplusLogo" class="flex items-center cursor-pointer">
                 <img src="https://placehold.co/40x40/667eea/ffffff?text=EP" alt="Eduplus Logo" class="rounded-full mr-3">
                 <h1 class="text-xl font-bold text-white whitespace-nowrap">Eduplus</h1>
             </div>
-            <button id="sidebarToggle" class="toggle-button md:hidden"> <!-- Show only on medium and smaller screens -->
+            <!-- Close button for mobile sidebar -->
+            <button id="closeSidebar" class="text-white text-2xl md:hidden">
+                <i class="fas fa-times"></i>
+            </button>
+            <!-- Desktop sidebar toggle button - moved here -->
+            <button id="desktopSidebarToggle" class="toggle-button text-white text-2xl hidden md:block">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -493,7 +661,7 @@
             </ul>
         </nav>
 
-        <div class="mt-auto px-2 py-4 border-t border-gray-700">
+        <div class="sidebar-footer mt-auto px-2 py-4 border-t border-gray-700">
             <div class="flex items-center sidebar-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
@@ -505,29 +673,37 @@
         </div>
     </aside>
 
+    <!-- Sidebar Overlay (for mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col main-content-area">
         <!-- Header -->
-        <header class="header p-4 flex flex-col sm:flex-row items-center justify-between">
-            <div class="flex items-center mb-4 sm:mb-0">
+        <header class="header">
+            <!-- Hamburger menu for mobile, hidden on desktop -->
+            <button id="openSidebar" class="toggle-button mr-4 md:hidden">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Removed desktopSidebarToggle from here -->
+            <div class="flex items-center flex-grow">
                 <h2 class="text-xl sm:text-2xl font-semibold" id="currentSectionTitle">Eduplus Campus TPO Home Page</h2>
             </div>
-            <div class="flex flex-wrap items-center justify-center sm:justify-end space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
                 <!-- Theme Toggle Button -->
                 <button id="themeToggle" class="text-gray-600 dark:text-gray-300 text-xl focus:outline-none">
                     <i class="fas fa-moon"></i>
                 </button>
 
                 <div class="flex items-center text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-                    <i class="fas fa-wifi mr-2"></i>
+                    <i class="fas fa-wifi mr-1 sm:mr-2"></i>
                     <span>169 Mbps</span>
                 </div>
                 <div class="relative">
                     <i class="fas fa-bell text-gray-600 dark:text-gray-300 text-xl cursor-pointer"></i>
-                    <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">3</span>
+                    <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">3</span>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <img src="https://placehold.co/40x40/c0c0c0/ffffff?text=S" alt="User Avatar" class="rounded-full border-2 border-blue-500">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <img src="https://placehold.co/32x32/c0c0c0/ffffff?text=S" alt="User Avatar" class="rounded-full border-2 border-blue-500 w-8 h-8 sm:w-10 sm:h-10">
                     <span class="font-medium hidden md:block">Soham Kolte</span>
                 </div>
             </div>
@@ -538,21 +714,21 @@
 
             <!-- Home Page Section -->
             <section id="home-page-content" class="content-section">
-                <div class="card p-6 text-center">
+                <div class="card text-center">
                     <h3 class="text-2xl sm:text-3xl font-bold mb-4">Welcome to Eduplus Campus TPO!</h3>
                     <p class="text-base sm:text-lg text-gray-700 dark:text-gray-300">Your central hub for all campus placement and training activities.</p>
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="card p-4 flex flex-col items-center">
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="card flex flex-col items-center">
                             <i class="fas fa-building text-3xl sm:text-4xl text-blue-500 mb-3"></i>
                             <h4 class="font-semibold text-lg sm:text-xl mb-2">Explore Companies</h4>
                             <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Discover new opportunities from various companies.</p>
                         </div>
-                        <div class="card p-4 flex flex-col items-center">
+                        <div class="card flex flex-col items-center">
                             <i class="fas fa-user-check text-3xl sm:text-4xl text-green-500 mb-3"></i>
                             <h4 class="font-semibold text-lg sm:text-xl mb-2">Manage Profile</h4>
                             <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Keep your academic and personal details up-to-date.</p>
                         </div>
-                        <div class="card p-4 flex flex-col items-center">
+                        <div class="card flex flex-col items-center">
                             <i class="fas fa-calendar-check text-3xl sm:text-4xl text-purple-500 mb-3"></i>
                             <h4 class="font-semibold text-lg sm:text-xl mb-2">View Schedules</h4>
                             <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Stay informed about your upcoming interviews and tests.</p>
@@ -564,7 +740,7 @@
             <!-- Companies Dashboard Section -->
             <section id="company-dashboard-content" class="content-section hidden">
                 <!-- Metric Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="metric-card">
                         <div class="metric-label">Total Companies</div>
                         <div class="metric-value">120</div>
@@ -584,7 +760,7 @@
                 </div>
 
                 <!-- Search and Filters -->
-                <div class="card p-4 sm:p-6 mb-6">
+                <div class="card mb-6">
                     <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
                         <div class="relative flex-grow w-full md:w-auto">
                             <input type="text" placeholder="Search companies..." class="search-input pr-10" id="searchInput">
@@ -600,20 +776,20 @@
                 </div>
 
                 <!-- Data Table -->
-                <div class="card p-4 sm:p-6 data-table-container">
+                <div class="card data-table-container">
                     <table class="w-full text-left data-table">
                         <thead>
                             <tr class="table-header rounded-t-lg">
                                 <th class="p-2 sm:p-4 rounded-tl-lg">Company</th>
-                                <th class="p-2 sm:p-4">Company Info</th>
+                                <th class="p-2 sm:p-4">Info</th>
                                 <th class="p-2 sm:p-4">Criteria</th>
-                                <th class="p-2 sm:p-4">Selection Procedure</th>
-                                <th class="p-2 sm:p-4">Reg Start Time</th>
-                                <th class="p-2 sm:p-4">Reg End Time</th>
-                                <th class="p-2 sm:p-4">Max Package</th>
-                                <th class="p-2 sm:p-4">Min Package</th>
-                                <th class="p-2 sm:p-4">Placement Type</th>
-                                <th class="p-2 sm:p-4 rounded-tr-lg">Academic Year</th>
+                                <th class="p-2 sm:p-4">Procedure</th>
+                                <th class="p-2 sm:p-4">Reg Start</th>
+                                <th class="p-2 sm:p-4">Reg End</th>
+                                <th class="p-2 sm:p-4">Max Pkg</th>
+                                <th class="p-2 sm:p-4">Min Pkg</th>
+                                <th class="p-2 sm:p-4">Type</th>
+                                <th class="p-2 sm:p-4 rounded-tr-lg">Year</th>
                             </tr>
                         </thead>
                         <tbody id="companyTableBody">
@@ -644,9 +820,9 @@
 
             <!-- Applied Companies Section -->
             <section id="applied-companies-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Applied Companies</h3>
-                    <div class="alert-box blue mb-4 text-sm sm:text-base">
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Applied Companies</h3>
+                    <div class="alert-box blue mb-4">
                         <i class="fas fa-info-circle"></i>
                         <span>No companies applied yet. Start applying to new opportunities!</span>
                     </div>
@@ -672,18 +848,18 @@
 
             <!-- Scheduled Companies Section -->
             <section id="scheduled-companies-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Scheduled Companies</h3>
-                    <div class="alert-box red mb-6 text-sm sm:text-base">
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Scheduled Companies</h3>
+                    <div class="alert-box red mb-6">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>No Schedule Company Found For Passout Batch 2026-27</span>
                     </div>
 
-                    <h4 class="text-base sm:text-lg font-semibold">Instructions</h4>
+                    <h4 class="text-base sm:text-lg font-semibold mb-2">Instructions</h4>
                     <p class="mb-4 text-sm sm:text-base">Here Are Step-by-Step Instructions You Should Follow If You Are Getting An Error Like No Schedule Company Found For Passout Batch 2026-27.</p>
 
                     <h5 class="text-md sm:text-base font-semibold mb-2">Here Are The Steps</h5>
-                    <ol class="list-decimal list-inside instruction-list text-sm sm:text-base">
+                    <ol class="list-decimal list-inside instruction-list">
                         <li>
                             <strong>Step 1: Go To Personal Details Tab</strong>
                             <p class="ml-6 text-xs sm:text-sm">Click on the Avatar icon located at the Top-Right Corner of your portal. You will see the <strong class="text-gray-800">User Profile</strong> option in the popup menu – click on it. Alternatively, open the Navigation Menu, and you will find a tab named <strong class="text-gray-800">Fill Profile</strong>. Both options navigate to the same page. On that page go to the <strong class="text-gray-800">Personal Tab</strong> and click on it.</p>
@@ -706,8 +882,8 @@
 
             <!-- Fill Profile Section -->
             <section id="fill-profile-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Fill Profile</h3>
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Fill Profile</h3>
                     <div id="profileCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                         <!-- Profile cards will be dynamically loaded here -->
                     </div>
@@ -719,8 +895,8 @@
 
             <!-- Notices Section -->
             <section id="notices-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Notice Board</h3>
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Notice Board</h3>
                     <div class="data-table-container">
                         <table class="w-full text-left data-table">
                             <thead>
@@ -760,8 +936,8 @@
 
             <!-- Question Bank Section -->
             <section id="question-bank-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Question Bank Student</h3>
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Question Bank Student</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div>
                             <label for="companySelect" class="block text-sm font-medium">Choose Company</label>
@@ -802,7 +978,7 @@
 
             <!-- TPO Registration Section -->
             <section id="tpo-registration-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
+                <div class="card">
                     <div class="flex flex-col sm:flex-row items-center justify-between mb-6 space-y-4 sm:space-y-0">
                         <h3 class="text-lg sm:text-xl font-semibold">TPO Registration</h3>
                         <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">
@@ -840,11 +1016,40 @@
                 </div>
             </section>
 
+            <!-- Off Campus Job Section (New) -->
+            <section id="off-campus-job-content" class="content-section hidden">
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Off Campus Job Opportunities</h3>
+                    <div class="alert-box blue mb-4">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Explore various off-campus job listings.</span>
+                    </div>
+                    <div class="data-table-container">
+                        <table class="w-full text-left data-table">
+                            <thead>
+                                <tr class="table-header rounded-t-lg">
+                                    <th class="p-2 sm:p-4 rounded-tl-lg">Job Title</th>
+                                    <th class="p-2 sm:p-4">Company</th>
+                                    <th class="p-2 sm:p-4">Location</th>
+                                    <th class="p-2 sm:p-4">Date Posted</th>
+                                    <th class="p-2 sm:p-4 rounded-tr-lg">Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="p-4 text-center">No off-campus jobs available at the moment.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- Application Tracking Section -->
             <section id="application-tracking-content" class="content-section hidden">
-                <div class="card p-4 sm:p-6">
-                    <h3 class="text-lg sm:text-xl font-semibold">Application Tracking</h3>
-                    <div class="alert-box red mb-4 text-sm sm:text-base">
+                <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Application Tracking</h3>
+                    <div class="alert-box red mb-4">
                         <i class="fas fa-exclamation-circle"></i>
                         <span>Please Apply For company</span>
                         <button class="ml-auto px-3 py-1 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-200 text-xs sm:text-sm">CLOSE</button>
@@ -874,12 +1079,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const openSidebarBtn = document.getElementById('openSidebar'); // Mobile hamburger
+            const closeSidebarBtn = document.getElementById('closeSidebar'); // Mobile close button
+            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle'); // New desktop toggle
             const sidebarItems = document.querySelectorAll('.sidebar-item');
             const sidebarSpans = document.querySelectorAll('.sidebar-item span');
             const sidebarIcons = document.querySelectorAll('.sidebar-item i');
-            const h1Element = document.querySelector('h1.text-xl');
-            const imgElement = document.querySelector('img[alt="Eduplus Logo"]');
+            const h1Element = document.querySelector('.sidebar-header h1');
+            const imgElement = document.querySelector('.sidebar-header img');
             const contentSections = document.querySelectorAll('.content-section');
             const currentSectionTitle = document.getElementById('currentSectionTitle');
             const themeToggle = document.getElementById('themeToggle');
@@ -938,40 +1146,56 @@
             let currentPage = 1;
             let rowsPerPage = parseInt(rowsPerPageSelect.value);
 
-            // Function to toggle sidebar state
-            const toggleSidebar = () => {
-                // For larger screens, toggle the 'sidebar-collapsed' class
-                if (window.innerWidth > 768) {
-                    sidebar.classList.toggle('sidebar-collapsed');
-                    sidebarSpans.forEach(span => span.classList.toggle('hidden'));
-                    h1Element.classList.toggle('hidden');
-                    imgElement.classList.toggle('mr-3');
-                    imgElement.classList.toggle('mr-0');
-                    sidebarIcons.forEach(icon => {
-                        if (sidebar.classList.contains('sidebar-collapsed')) {
-                            icon.parentElement.style.justifyContent = 'center';
-                            icon.parentElement.style.padding = '0.75rem 0';
-                        } else {
-                            icon.parentElement.style.justifyContent = 'flex-start';
-                            icon.parentElement.style.padding = '1rem 1.5rem';
-                        }
-                    });
-                } else { // For smaller screens, toggle 'sidebar-open' class
-                    sidebar.classList.toggle('sidebar-open');
-                    // Ensure text and logo are visible when sidebar is open on small screens
+            // Function to open sidebar (mobile)
+            const openSidebar = () => {
+                sidebar.classList.add('open');
+                sidebarOverlay.style.display = 'block';
+                body.style.overflow = 'hidden'; // Prevent scrolling on body when sidebar is open
+                // Ensure text and logo are visible when sidebar opens on mobile
+                sidebarSpans.forEach(span => span.classList.remove('hidden'));
+                h1Element.classList.remove('hidden');
+                imgElement.classList.add('mr-3');
+                imgElement.classList.remove('mr-0');
+            };
+
+            // Function to close sidebar (mobile)
+            const closeSidebar = () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.style.display = 'none';
+                body.style.overflow = ''; // Restore scrolling on body
+                // Hide text and logo when sidebar closes on mobile
+                if (window.innerWidth < 768) {
+                    sidebarSpans.forEach(span => span.classList.add('hidden'));
+                    h1Element.classList.add('hidden');
+                    imgElement.classList.remove('mr-3');
+                    imgElement.classList.add('mr-0');
+                }
+            };
+
+            // Event listeners for sidebar toggle buttons
+            openSidebarBtn.addEventListener('click', openSidebar);
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar); // Close sidebar when clicking overlay
+
+            // Function to toggle sidebar state (for desktop collapse)
+            const toggleDesktopSidebar = () => {
+                sidebar.classList.toggle('collapsed');
+                // Toggle visibility of text and logo based on collapsed state
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebarSpans.forEach(span => span.classList.add('hidden'));
+                    h1Element.classList.add('hidden');
+                    imgElement.classList.remove('mr-3');
+                    imgElement.classList.add('mr-0');
+                } else {
                     sidebarSpans.forEach(span => span.classList.remove('hidden'));
                     h1Element.classList.remove('hidden');
                     imgElement.classList.add('mr-3');
                     imgElement.classList.remove('mr-0');
-                    sidebarIcons.forEach(icon => {
-                        icon.parentElement.style.justifyContent = 'flex-start';
-                        icon.parentElement.style.padding = '1rem 1.5rem';
-                    });
                 }
             };
+            // Event listener for desktop sidebar toggle button
+            desktopSidebarToggle.addEventListener('click', toggleDesktopSidebar);
 
-            // Event listener for sidebar toggle button
-            sidebarToggle.addEventListener('click', toggleSidebar);
 
             // Function to show a specific content section
             const showSection = (sectionId) => {
@@ -1011,8 +1235,8 @@
                 }
 
                 // Close sidebar on small screens after selecting a section
-                if (window.innerWidth <= 768 && sidebar.classList.contains('sidebar-open')) {
-                    sidebar.classList.remove('sidebar-open');
+                if (window.innerWidth < 768) { // Use < instead of <= for consistency with media query
+                    closeSidebar();
                 }
             };
 
@@ -1260,7 +1484,7 @@
 
                 for (let i = 1; i <= pageCount; i++) {
                     const btn = document.createElement('button');
-                    btn.classList.add('pagination-button', 'px-3', 'py-1', 'rounded-md', 'text-sm');
+                    btn.classList.add('pagination-button');
                     btn.textContent = i;
                     if (i === page) {
                         btn.classList.add('active');
@@ -1312,32 +1536,45 @@
 
             // Handle window resize for sidebar behavior
             const handleResize = () => {
-                if (window.innerWidth > 768) {
-                    // On larger screens, ensure sidebar is expanded by default (not collapsed)
-                    sidebar.classList.remove('sidebar-open'); // Remove mobile open state
-                    sidebar.classList.remove('sidebar-collapsed'); // Ensure it's not collapsed by default
-                    sidebarSpans.forEach(span => span.classList.remove('hidden'));
-                    h1Element.classList.remove('hidden');
-                    imgElement.classList.add('mr-3');
-                    imgElement.classList.remove('mr-0');
-                    sidebarIcons.forEach(icon => {
-                        icon.parentElement.style.justifyContent = 'flex-start';
-                        icon.parentElement.style.padding = '1rem 1.5rem';
-                    });
-                    sidebarToggle.classList.add('hidden'); // Hide toggle button on large screens
-                } else {
-                    // On smaller screens, hide sidebar by default and show toggle
-                    sidebar.classList.remove('sidebar-open'); // Ensure it's closed
-                    sidebar.classList.remove('sidebar-collapsed'); // Remove collapsed state
-                    sidebarSpans.forEach(span => span.classList.add('hidden'));
-                    h1Element.classList.add('hidden');
-                    imgElement.classList.remove('mr-3');
-                    imgElement.classList.add('mr-0');
-                    sidebarIcons.forEach(icon => {
-                        icon.parentElement.style.justifyContent = 'center';
-                        icon.parentElement.style.padding = '0.75rem 0';
-                    });
-                    sidebarToggle.classList.remove('hidden'); // Show toggle button on small screens
+                if (window.innerWidth >= 768) { // Desktop view
+                    sidebar.classList.remove('open'); // Ensure mobile overlay is closed
+                    sidebarOverlay.style.display = 'none'; // Hide overlay
+                    body.style.overflow = ''; // Restore body scrolling
+                    openSidebarBtn.classList.add('hidden'); // Hide mobile hamburger
+                    desktopSidebarToggle.classList.remove('hidden'); // Show desktop toggle
+
+                    // Ensure desktop sidebar is initially expanded or respects its last state
+                    if (!sidebar.classList.contains('collapsed')) { // Only expand if not explicitly collapsed
+                        sidebarSpans.forEach(span => span.classList.remove('hidden'));
+                        h1Element.classList.remove('hidden');
+                        imgElement.classList.add('mr-3');
+                        imgElement.classList.remove('mr-0');
+                    } else { // If it was collapsed, keep text hidden
+                        sidebarSpans.forEach(span => span.classList.add('hidden'));
+                        h1Element.classList.add('hidden');
+                        imgElement.classList.remove('mr-3');
+                        imgElement.classList.add('mr-0');
+                    }
+                } else { // Mobile view
+                    // Ensure sidebar is closed and hamburger is visible
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.style.display = 'none';
+                    body.style.overflow = '';
+                    openSidebarBtn.classList.remove('hidden'); // Show mobile hamburger
+                    desktopSidebarToggle.classList.add('hidden'); // Hide desktop toggle
+
+                    // When in mobile view, if sidebar is open, show text. If closed, hide text.
+                    if (sidebar.classList.contains('open')) {
+                        sidebarSpans.forEach(span => span.classList.remove('hidden'));
+                        h1Element.classList.remove('hidden');
+                        imgElement.classList.add('mr-3');
+                        imgElement.classList.remove('mr-0');
+                    } else {
+                        sidebarSpans.forEach(span => span.classList.add('hidden'));
+                        h1Element.classList.add('hidden');
+                        imgElement.classList.remove('mr-3');
+                        imgElement.classList.add('mr-0');
+                    }
                 }
             };
 
