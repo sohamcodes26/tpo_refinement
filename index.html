@@ -7,598 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* CSS Variables for Light Mode (Default) */
-        :root {
-            --bg-color: #f4f7f6;
-            --text-color: #4a5568;
-            --card-bg: #ffffff;
-            --header-bg: #ffffff;
-            --sidebar-bg: #1a202c;
-            --sidebar-text: #e2e8f0;
-            --sidebar-hover-bg: #2d3748;
-            --sidebar-active-bg: #4a5568;
-            --table-header-bg: #edf2f7;
-            --table-row-even-bg: #f7fafc;
-            --table-row-hover-bg: #ebf8ff;
-            --border-color: #e2e8f0;
-            --input-border: #cbd5e0;
-            --profile-icon-color: #4a5568;
-            --toggle-button-bg: #4a5568;
-            --toggle-button-hover-bg: #2d3748;
-        }
-
-        /* CSS Variables for Dark Mode */
-        body.dark-mode {
-            --bg-color: #1a202c;
-            --text-color: #e2e8f0;
-            --card-bg: #2d3748;
-            --header-bg: #2d3748;
-            --sidebar-bg: #0f172a;
-            --sidebar-text: #ffffff;
-            --sidebar-hover-bg: #4a5568;
-            --sidebar-active-bg: #6366f1; /* A distinct blue for active in dark mode */
-            --table-header-bg: #4a5568;
-            --table-row-even-bg: #2d3748;
-            --table-row-hover-bg: #4a5568;
-            --border-color: #4a5568;
-            --input-border: #4a5568;
-            --profile-icon-color: #a0aec0;
-            --toggle-button-bg: #6366f1;
-            --toggle-button-hover-bg: #4f46e5;
-        }
-
-        /* Apply CSS Variables */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease; /* Smooth transition for background */
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color); /* Apply text color variable */
-            display: flex; /* Make body a flex container */
-            flex-direction: column; /* Stack header and main content vertically on mobile */
-            height: 100vh; /* Ensure body takes full viewport height */
-            overflow: hidden; /* Prevent body from scrolling, let children handle it */
-        }
-
-        /* Sidebar specific styles */
-        .sidebar {
-            position: fixed; /* Fixed position for overlay on mobile */
-            top: 0;
-            left: -280px; /* Start off-screen, matching width */
-            width: 280px; /* Fixed width for mobile sidebar */
-            height: 100%;
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: left 0.3s ease-in-out; /* Smooth slide-in/out */
-            z-index: 100; /* High z-index to be on top */
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-        }
-        .sidebar.open {
-            left: 0; /* Slide in */
-        }
-        /* Overlay for when sidebar is open */
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 90;
-            display: none; /* Hidden by default */
-        }
-        .sidebar.open + .sidebar-overlay {
-            display: block; /* Show when sidebar is open */
-        }
-
-        /* Desktop sidebar styles */
-        @media (min-width: 768px) { /* On medium screens and larger */
-            body {
-                flex-direction: row; /* Sidebar and main content side-by-side */
-            }
-            .sidebar {
-                position: static; /* Not fixed on desktop */
-                width: 280px; /* Default desktop width (increased for text) */
-                height: 100%;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                transition: width 0.3s ease;
-                flex-shrink: 0;
-                left: 0; /* Reset left property */
-                padding: 1.5rem; /* Adjust padding for desktop */
-            }
-            .sidebar.collapsed {
-                width: 90px; /* Collapsed width */
-            }
-            .sidebar-overlay {
-                display: none !important; /* Always hide overlay on desktop */
-            }
-            .main-content-area {
-                margin-left: 0; /* No margin needed, flex handles it */
-            }
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .sidebar-item:hover {
-            background-color: var(--sidebar-hover-bg);
-            color: var(--sidebar-text);
-        }
-        .sidebar-item.active {
-            background-color: var(--sidebar-active-bg);
-            color: var(--sidebar-text);
-            font-weight: 600;
-        }
-        .sidebar-item i {
-            margin-right: 1rem;
-            font-size: 1.25rem;
-        }
-        .sidebar-item span {
-            white-space: nowrap; /* Prevent text wrapping */
-            display: block; /* Default to block for text visibility */
-            /* Removed overflow: hidden and text-overflow: ellipsis from here */
-        }
-
-        /* Collapsed sidebar adjustments for desktop */
-        .sidebar.collapsed .sidebar-item {
-            justify-content: center;
-            padding: 0.75rem 0.5rem;
-        }
-        .sidebar.collapsed .sidebar-item i {
-            margin-right: 0;
-        }
-        .sidebar.collapsed .sidebar-item span {
-            display: none; /* Hide text when collapsed */
-            overflow: hidden; /* Apply overflow and ellipsis only when collapsed */
-            text-overflow: ellipsis;
-        }
-        .sidebar.collapsed .sidebar-header h1 {
-            display: none;
-        }
-        .sidebar.collapsed .sidebar-header img {
-            margin-right: 0 !important;
-        }
-        .sidebar.collapsed .sidebar-footer .sidebar-item span {
-            display: none;
-        }
-        .sidebar.collapsed .sidebar-footer .sidebar-item {
-            justify-content: center;
-        }
-
-        /* Main content area */
-        .main-content-area {
-            flex-grow: 1; /* Take remaining space */
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto; /* Allow main content to scroll */
-        }
-        .header {
-            background-color: var(--header-bg);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            padding: 1rem; /* Default padding for mobile */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-        }
-        @media (min-width: 640px) { /* Adjust header for sm breakpoint */
-            .header {
-                padding: 1.5rem;
-                flex-wrap: nowrap; /* Prevent wrapping on larger screens */
-            }
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.3s ease;
-            padding: 1rem; /* Default padding for mobile */
-        }
-        @media (min-width: 640px) {
-            .card {
-                padding: 1.5rem; /* Adjust padding for sm breakpoint */
-            }
-        }
-
-        .table-header {
-            background-color: var(--table-header-bg);
-            color: var(--text-color);
-            font-weight: 600;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .table-row:nth-child(even) {
-            background-color: var(--table-row-even-bg);
-            transition: background-color 0.3s ease;
-        }
-        .table-row:hover {
-            background-color: var(--table-row-hover-bg);
-            transition: background-color 0.3s ease;
-        }
-        .search-input, .select-input {
-            border: 1px solid var(--input-border);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            width: 100%;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-        }
-        .search-input:focus, .select-input:focus {
-            border-color: #63b3ed;
-            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5);
-            outline: none;
-        }
-        .pagination-button {
-            background-color: var(--table-header-bg);
-            color: var(--text-color);
-            padding: 0.5rem 0.75rem; /* Smaller padding for mobile */
-            border-radius: 0.5rem;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            font-size: 0.875rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .pagination-button {
-                padding: 0.5rem 1rem; /* Larger padding for sm breakpoint */
-                font-size: 1rem;
-            }
-        }
-        .pagination-button:hover {
-            background-color: var(--sidebar-hover-bg);
-        }
-        .pagination-button.active {
-            background-color: var(--sidebar-active-bg);
-            color: #ffffff;
-        }
-        .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem; /* Smaller padding for mobile */
-            border-radius: 0.75rem;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100px; /* Smaller min-height for mobile */
-        }
-        @media (min-width: 640px) {
-            .metric-card {
-                padding: 1.5rem;
-                min-height: 120px;
-            }
-        }
-        .metric-card.green {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-        .metric-card.orange {
-            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
-        }
-        .metric-card.red {
-            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
-        }
-        .metric-value {
-            font-size: 2rem; /* Smaller font for mobile */
-            font-weight: 700;
-            line-height: 1;
-        }
-        @media (min-width: 640px) {
-            .metric-value {
-                font-size: 2.5rem;
-            }
-        }
-        .metric-label {
-            font-size: 0.8rem; /* Smaller font for mobile */
-            opacity: 0.9;
-        }
-        @media (min-width: 640px) {
-            .metric-label {
-                font-size: 0.9rem;
-            }
-        }
-        .toggle-button {
-            background-color: var(--toggle-button-bg);
-            color: white;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .toggle-button:hover {
-            background-color: var(--toggle-button-hover-bg);
-        }
-        /* Table responsiveness */
-        .data-table-container {
-            overflow-x: auto; /* Allow horizontal scrolling for tables on small screens */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-        .data-table {
-            width: 100%; /* Make table take full width of its container */
-            min-width: 700px; /* Ensure a minimum width for the table to prevent squishing */
-            table-layout: auto; /* Allow columns to size based on content, but with min-width */
-        }
-        .data-table th, .data-table td {
-            padding: 0.5rem; /* Smaller padding for mobile */
-            word-wrap: break-word;
-            color: var(--text-color);
-            min-width: 60px; /* Minimum width for table cells */
-            font-size: 0.875rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .data-table th, .data-table td {
-                padding: 0.75rem;
-                min-width: 80px;
-                font-size: 1rem;
-            }
-        }
-
-        .profile-card {
-            background-color: var(--card-bg);
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            padding: 1rem; /* Smaller padding for mobile */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 120px; /* Smaller min-height for mobile */
-            position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-        }
-        @media (min-width: 640px) {
-            .profile-card {
-                padding: 1.5rem;
-                min-height: 150px;
-            }
-        }
-        .profile-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-        }
-        .profile-card i {
-            font-size: 2.5rem; /* Smaller font for mobile */
-            color: var(--profile-icon-color);
-            margin-bottom: 0.5rem;
-        }
-        @media (min-width: 640px) {
-            .profile-card i {
-                font-size: 3rem;
-                margin-bottom: 0.75rem;
-            }
-        }
-        .profile-card .status-icon {
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            font-size: 1.25rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .profile-card .status-icon {
-                top: 0.75rem;
-                left: 0.75rem;
-                font-size: 1.5rem;
-            }
-        }
-        .profile-card .action-icons {
-            position: absolute;
-            bottom: 0.5rem;
-            right: 0.5rem;
-            display: flex;
-            gap: 0.25rem; /* Smaller gap for mobile */
-        }
-        @media (min-width: 640px) {
-            .profile-card .action-icons {
-                bottom: 0.75rem;
-                right: 0.75rem;
-                gap: 0.5rem;
-            }
-        }
-        .profile-card .action-icons i {
-            font-size: 1rem; /* Smaller font for mobile */
-            cursor: pointer;
-            margin: 0;
-        }
-        @media (min-width: 640px) {
-            .profile-card .action-icons i {
-                font-size: 1.25rem;
-            }
-        }
-        .profile-card .action-icons .edit-icon {
-            color: #2563eb;
-        }
-        .profile-card .action-icons .delete-icon {
-            color: #ef4444;
-        }
-        .alert-box {
-            padding: 0.75rem; /* Smaller padding for mobile */
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-            font-size: 0.875rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .alert-box {
-                padding: 1rem;
-                font-size: 1rem;
-            }
-        }
-        .alert-box.red {
-            background-color: #fee2e2;
-            color: #ef4444;
-            border: 1px solid #ef4444;
-        }
-        .alert-box.blue {
-            background-color: #e0f2fe;
-            color: #2563eb;
-            border: 1px solid #2563eb;
-        }
-        .alert-box i {
-            margin-right: 0.5rem; /* Smaller margin for mobile */
-            font-size: 1rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .alert-box i {
-                margin-right: 0.75rem;
-                font-size: 1.25rem;
-            }
-        }
-        .instruction-list li {
-            margin-bottom: 0.5rem; /* Smaller margin for mobile */
-            font-size: 0.875rem; /* Smaller font for mobile */
-        }
-        @media (min-width: 640px) {
-            .instruction-list li {
-                margin-bottom: 0.75rem;
-                font-size: 1rem;
-            }
-        }
-        .instruction-list strong {
-            color: var(--text-color);
-        }
-        .registration-card {
-            background-color: var(--card-bg);
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            padding: 1rem; /* Smaller padding for mobile */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100px; /* Smaller min-height for mobile */
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-        }
-        @media (min-width: 640px) {
-            .registration-card {
-                padding: 1.5rem;
-                min-height: 120px;
-            }
-        }
-        .registration-card::before {
-            content: "\f15c";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            font-size: 1.5rem; /* Smaller font for mobile */
-            color: var(--border-color);
-            opacity: 0.5;
-            transition: color 0.3s ease;
-        }
-        @media (min-width: 640px) {
-            .registration-card::before {
-                top: 0.75rem;
-                right: 0.75rem;
-                font-size: 2rem;
-            }
-        }
-        .registration-card h3 {
-            font-size: 1.125rem; /* Smaller font for mobile */
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            color: var(--text-color);
-        }
-        @media (min-width: 640px) {
-            .registration-card h3 {
-                font-size: 1.25rem;
-                margin-bottom: 0.5rem;
-            }
-        }
-        .registration-card p {
-            font-size: 0.8rem; /* Smaller font for mobile */
-            color: var(--text-color);
-        }
-        @media (min-width: 640px) {
-            .registration-card p {
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.hidden {
-            display: none;
-        }
-        .modal-content {
-            background-color: var(--card-bg);
-            margin: auto;
-            padding: 1.5rem; /* Smaller padding for mobile */
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            width: 95%; /* Wider for mobile */
-            max-width: 450px; /* Max width for larger screens */
-            position: relative;
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        @media (min-width: 640px) {
-            .modal-content {
-                padding: 2rem;
-                max-width: 500px;
-            }
-        }
-        .close-button {
-            color: var(--text-color);
-            position: absolute;
-            top: 0.75rem; /* Smaller top/right for mobile */
-            right: 0.75rem;
-            font-size: 1.25rem; /* Smaller font for mobile */
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        @media (min-width: 640px) {
-            .close-button {
-                top: 1rem;
-                right: 1rem;
-                font-size: 1.5rem;
-            }
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: #ef4444;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- Sidebar (Mobile Overlay / Desktop Static) -->
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header flex items-center justify-between mb-8 px-2">
@@ -606,239 +17,117 @@
                 <img src="https://placehold.co/40x40/667eea/ffffff?text=EP" alt="Eduplus Logo" class="rounded-full mr-3">
                 <h1 class="text-xl font-bold text-white whitespace-nowrap">Eduplus</h1>
             </div>
-            <!-- Close button for mobile sidebar -->
-            <button id="closeSidebar" class="text-white text-2xl md:hidden">
-                <i class="fas fa-times"></i>
-            </button>
-            <!-- Desktop sidebar toggle button - moved here -->
-            <button id="desktopSidebarToggle" class="toggle-button text-white text-2xl hidden md:block">
-                <i class="fas fa-bars"></i>
+            <button id="desktopSidebarToggle" class="hidden md:block text-white focus:outline-none">
+                <i class="fas fa-chevron-left"></i>
             </button>
         </div>
 
-        <nav class="flex-1">
-            <ul>
-                <li class="sidebar-item" data-section="home-page">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </li>
-                <li class="sidebar-item active" data-section="company-dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Companies Dashboard</span>
-                </li>
-                <li class="sidebar-item" data-section="applied-companies">
-                    <i class="fas fa-building"></i>
-                    <span>Applied Companies</span>
-                </li>
-                <li class="sidebar-item" data-section="scheduled-companies">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Scheduled Companies</span>
-                </li>
-                <li class="sidebar-item" data-section="fill-profile">
-                    <i class="fas fa-user-edit"></i>
-                    <span>Fill Profile</span>
-                </li>
-                <li class="sidebar-item" data-section="notices">
-                    <i class="fas fa-bell"></i>
-                    <span>Notices</span>
-                </li>
-                <li class="sidebar-item" data-section="question-bank">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Question Bank</span>
-                </li>
-                <li class="sidebar-item" data-section="tpo-registration">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>TPO Registration</span>
-                </li>
-                <li class="sidebar-item" data-section="application-tracking">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Application Tracking</span>
-                </li>
-                <li class="sidebar-item" data-section="off-campus-job">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Off Campus Job</span>
-                </li>
-            </ul>
+        <nav class="flex-grow">
+            <a href="#" class="sidebar-item active" data-target="home-page">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="sidebar-item" data-target="profile-management">
+                <i class="fas fa-users"></i>
+                <span>Profile Management</span>
+            </a>
+            <a href="#" class="sidebar-item" data-target="registration-management">
+                <i class="fas fa-file-alt"></i>
+                <span>Registration</span>
+            </a>
+            <a href="#" class="sidebar-item" data-target="instructions-page">
+                <i class="fas fa-info-circle"></i>
+                <span>Instructions</span>
+            </a>
         </nav>
 
-        <div class="sidebar-footer mt-auto px-2 py-4 border-t border-gray-700">
-            <div class="flex items-center sidebar-item">
+        <div class="sidebar-footer">
+            <a href="#" class="sidebar-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
-            </div>
-            <div class="flex items-center sidebar-item">
+            </a>
+            <a href="#" class="sidebar-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
-            </div>
+            </a>
         </div>
     </aside>
-
-    <!-- Sidebar Overlay (for mobile) -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <div class="sidebar-overlay"></div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col main-content-area">
+    <div class="main-content-area">
         <!-- Header -->
         <header class="header">
-            <!-- Hamburger menu for mobile, hidden on desktop -->
-            <button id="openSidebar" class="toggle-button mr-4 md:hidden">
+            <!-- Mobile Hamburger Menu -->
+            <button id="openSidebarBtn" class="md:hidden text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Removed desktopSidebarToggle from here -->
-            <div class="flex items-center flex-grow">
-                <h2 class="text-xl sm:text-2xl font-semibold" id="currentSectionTitle">Eduplus Campus TPO Home Page</h2>
-            </div>
-            <div class="flex items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
-                <!-- Theme Toggle Button -->
-                <button id="themeToggle" class="text-gray-600 dark:text-gray-300 text-xl focus:outline-none">
+            <h2 class="text-xl sm:text-2xl font-semibold hidden sm:block">Welcome Back!</h2>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="toggle-button">
                     <i class="fas fa-moon"></i>
                 </button>
-
-                <div class="flex items-center text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-                    <i class="fas fa-wifi mr-1 sm:mr-2"></i>
-                    <span>169 Mbps</span>
-                </div>
                 <div class="relative">
-                    <i class="fas fa-bell text-gray-600 dark:text-gray-300 text-xl cursor-pointer"></i>
-                    <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">3</span>
-                </div>
-                <div class="flex items-center space-x-1 sm:space-x-2">
-                    <img src="https://placehold.co/32x32/c0c0c0/ffffff?text=S" alt="User Avatar" class="rounded-full border-2 border-blue-500 w-8 h-8 sm:w-10 sm:h-10">
-                    <span class="font-medium hidden md:block">Soham Kolte</span>
+                    <img src="https://placehold.co/40x40/a0aec0/ffffff?text=U" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer">
                 </div>
             </div>
         </header>
 
-        <!-- Page Content Sections -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6">
-
+        <!-- Page Content -->
+        <main class="flex-grow p-4 sm:p-6 space-y-6">
             <!-- Home Page Section -->
-            <section id="home-page-content" class="content-section">
-                <div class="card text-center">
-                    <h3 class="text-2xl sm:text-3xl font-bold mb-4">Welcome to Eduplus Campus TPO!</h3>
-                    <p class="text-base sm:text-lg text-gray-700 dark:text-gray-300">Your central hub for all campus placement and training activities.</p>
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        <div class="card flex flex-col items-center">
-                            <i class="fas fa-building text-3xl sm:text-4xl text-blue-500 mb-3"></i>
-                            <h4 class="font-semibold text-lg sm:text-xl mb-2">Explore Companies</h4>
-                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Discover new opportunities from various companies.</p>
-                        </div>
-                        <div class="card flex flex-col items-center">
-                            <i class="fas fa-user-check text-3xl sm:text-4xl text-green-500 mb-3"></i>
-                            <h4 class="font-semibold text-lg sm:text-xl mb-2">Manage Profile</h4>
-                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Keep your academic and personal details up-to-date.</p>
-                        </div>
-                        <div class="card flex flex-col items-center">
-                            <i class="fas fa-calendar-check text-3xl sm:text-4xl text-purple-500 mb-3"></i>
-                            <h4 class="font-semibold text-lg sm:text-xl mb-2">View Schedules</h4>
-                            <p class="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400">Stay informed about your upcoming interviews and tests.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Companies Dashboard Section -->
-            <section id="company-dashboard-content" class="content-section hidden">
+            <section id="home-page" class="page-section space-y-6">
                 <!-- Metric Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <div class="metric-card">
-                        <div class="metric-label">Total Companies</div>
-                        <div class="metric-value">120</div>
+                        <div class="metric-label">Total Students</div>
+                        <div class="metric-value">1,250</div>
                     </div>
                     <div class="metric-card green">
-                        <div class="metric-label">Applied Companies</div>
-                        <div class="metric-value">45</div>
+                        <div class="metric-label">New Registrations</div>
+                        <div class="metric-value">82</div>
                     </div>
                     <div class="metric-card orange">
-                        <div class="metric-label">Scheduled Interviews</div>
-                        <div class="metric-value">12</div>
+                        <div class="metric-label">Pending Approvals</div>
+                        <div class="metric-value">15</div>
                     </div>
                     <div class="metric-card red">
-                        <div class="metric-label">Pending Applications</div>
-                        <div class="metric-value">63</div>
+                        <div class="metric-label">Issues Reported</div>
+                        <div class="metric-value">3</div>
                     </div>
                 </div>
 
-                <!-- Search and Filters -->
-                <div class="card mb-6">
-                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
-                        <div class="relative flex-grow w-full md:w-auto">
-                            <input type="text" placeholder="Search companies..." class="search-input pr-10" id="searchInput">
-                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                        <div class="flex flex-wrap justify-center md:justify-end gap-2 mt-4 md:mt-0">
-                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Company Info</button>
-                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Criteria</button>
-                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Selection Procedure</button>
-                            <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Filters <i class="fas fa-filter ml-2"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Data Table -->
-                <div class="card data-table-container">
-                    <table class="w-full text-left data-table">
-                        <thead>
-                            <tr class="table-header rounded-t-lg">
-                                <th class="p-2 sm:p-4 rounded-tl-lg">Company</th>
-                                <th class="p-2 sm:p-4">Info</th>
-                                <th class="p-2 sm:p-4">Criteria</th>
-                                <th class="p-2 sm:p-4">Procedure</th>
-                                <th class="p-2 sm:p-4">Reg Start</th>
-                                <th class="p-2 sm:p-4">Reg End</th>
-                                <th class="p-2 sm:p-4">Max Pkg</th>
-                                <th class="p-2 sm:p-4">Min Pkg</th>
-                                <th class="p-2 sm:p-4">Type</th>
-                                <th class="p-2 sm:p-4 rounded-tr-lg">Year</th>
-                            </tr>
-                        </thead>
-                        <tbody id="companyTableBody">
-                            <!-- Data will be populated by JS -->
-                        </tbody>
-                    </table>
-
-                    <!-- Pagination -->
-                    <div class="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
-                        <div class="text-sm">
-                            Rows per page:
-                            <select class="ml-2 p-2 border border-gray-300 rounded-md" id="rowsPerPage">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center space-x-2" id="paginationControls">
-                            <button class="pagination-button" id="prevPage"><i class="fas fa-chevron-left"></i></button>
-                            <div id="pageNumbers" class="flex space-x-2">
-                                <!-- Page numbers will be inserted here by JS -->
-                            </div>
-                            <button class="pagination-button" id="nextPage"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Applied Companies Section -->
-            <section id="applied-companies-content" class="content-section hidden">
+                <!-- Recent Activity Table -->
                 <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Applied Companies</h3>
-                    <div class="alert-box blue mb-4">
-                        <i class="fas fa-info-circle"></i>
-                        <span>No companies applied yet. Start applying to new opportunities!</span>
-                    </div>
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Recent Student Activity</h3>
                     <div class="data-table-container">
-                        <table class="w-full text-left data-table">
-                            <thead>
-                                <tr class="table-header rounded-t-lg">
-                                    <th class="p-2 sm:p-4 rounded-tl-lg">Company Name</th>
-                                    <th class="p-2 sm:p-4">Application Date</th>
-                                    <th class="p-2 sm:p-4">Status</th>
-                                    <th class="p-2 sm:p-4 rounded-tr-lg">Actions</th>
+                        <table class="data-table">
+                            <thead class="table-header">
+                                <tr>
+                                    <th class="text-left">Student Name</th>
+                                    <th class="text-left">Course</th>
+                                    <th class="text-left">Date</th>
+                                    <th class="text-center">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="4" class="p-4 text-center">No data available</td>
+                                <tr class="table-row">
+                                    <td>Alex Johnson</td>
+                                    <td>Computer Science</td>
+                                    <td>2024-08-12</td>
+                                    <td class="text-center"><span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Completed</span></td>
+                                </tr>
+                                <tr class="table-row">
+                                    <td>Maria Garcia</td>
+                                    <td>Business Administration</td>
+                                    <td>2024-08-11</td>
+                                    <td class="text-center"><span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">In Progress</span></td>
+                                </tr>
+                                 <tr class="table-row">
+                                    <td>James Smith</td>
+                                    <td>Graphic Design</td>
+                                    <td>2024-08-10</td>
+                                    <td class="text-center"><span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Dropped</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -846,745 +135,129 @@
                 </div>
             </section>
 
-            <!-- Scheduled Companies Section -->
-            <section id="scheduled-companies-content" class="content-section hidden">
-                <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Scheduled Companies</h3>
-                    <div class="alert-box red mb-6">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>No Schedule Company Found For Passout Batch 2026-27</span>
-                    </div>
-
-                    <h4 class="text-base sm:text-lg font-semibold mb-2">Instructions</h4>
-                    <p class="mb-4 text-sm sm:text-base">Here Are Step-by-Step Instructions You Should Follow If You Are Getting An Error Like No Schedule Company Found For Passout Batch 2026-27.</p>
-
-                    <h5 class="text-md sm:text-base font-semibold mb-2">Here Are The Steps</h5>
-                    <ol class="list-decimal list-inside instruction-list">
-                        <li>
-                            <strong>Step 1: Go To Personal Details Tab</strong>
-                            <p class="ml-6 text-xs sm:text-sm">Click on the Avatar icon located at the Top-Right Corner of your portal. You will see the <strong class="text-gray-800">User Profile</strong> option in the popup menu – click on it. Alternatively, open the Navigation Menu, and you will find a tab named <strong class="text-gray-800">Fill Profile</strong>. Both options navigate to the same page. On that page go to the <strong class="text-gray-800">Personal Tab</strong> and click on it.</p>
-                        </li>
-                        <li>
-                            <strong>Step 2: Check That All Details Are Filled Properly, Especially The Year of Passing and Program/Branch.</strong>
-                            <p class="ml-6 text-xs sm:text-sm">After Opening Personal Details, You Must Check That Your <strong class="text-gray-800">Year of Passing</strong> and <strong class="text-gray-800">Program/Branch</strong> Are Filled in Correctly. Also, Make Sure That After Filling in All Details, the Profile Is Saved and Freeze.</p>
-                        </li>
-                        <li>
-                            <strong>Step 3 : Go To TPO Registration Tab</strong>
-                            <p class="ml-6 text-xs sm:text-sm">Click on the Navigation icon (Located at the Top-Left Corner – Three Horizontal Lines). After Clicking, You will See a Menu Slide in from the Left. In That Menu, There Is a Tab Named <strong class="text-gray-8-00">TPO Registration</strong> and click on it.</p>
-                        </li>
-                        <li>
-                            <strong>Step 4:</strong>
-                            <p class="ml-6 text-xs sm:text-sm">Register for the Type of Placement Company You Would Like to Apply for in Your Current Academic Year (2025-26).</p>
-                        </li>
-                    </ol>
-                </div>
-            </section>
-
-            <!-- Fill Profile Section -->
-            <section id="fill-profile-content" class="content-section hidden">
-                <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Fill Profile</h3>
-                    <div id="profileCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                        <!-- Profile cards will be dynamically loaded here -->
-                    </div>
-                    <button id="addProfileSectionBtn" class="mt-6 px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">
-                        <i class="fas fa-plus mr-2"></i>Add New Profile Section
-                    </button>
-                </div>
-            </section>
-
-            <!-- Notices Section -->
-            <section id="notices-content" class="content-section hidden">
-                <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Notice Board</h3>
-                    <div class="data-table-container">
-                        <table class="w-full text-left data-table">
-                            <thead>
-                                <tr class="table-header rounded-t-lg">
-                                    <th class="p-2 sm:p-4 rounded-tl-lg">Notice</th>
-                                    <th class="p-2 sm:p-4">Program</th>
-                                    <th class="p-2 sm:p-4">Year</th>
-                                    <th class="p-2 sm:p-4 rounded-tr-lg">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="p-4 text-center">No data available</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
-                        <div class="text-sm">
-                            Rows per page:
-                            <select class="ml-2 p-2 border border-gray-300 rounded-md">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="pagination-button"><i class="fas fa-chevron-left"></i></button>
-                            <button class="pagination-button active">1</button>
-                            <button class="pagination-button">2</button>
-                            <button class="pagination-button">3</button>
-                            <button class="pagination-button"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Question Bank Section -->
-            <section id="question-bank-content" class="content-section hidden">
-                <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Question Bank Student</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <div>
-                            <label for="companySelect" class="block text-sm font-medium">Choose Company</label>
-                            <select id="companySelect" class="select-input">
-                                <option>ALL</option>
-                                <option>Company A</option>
-                                <option>Company B</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="roundSelect" class="block text-sm font-medium">Round</label>
-                            <select id="roundSelect" class="select-input">
-                                <option>ALL</option>
-                                <option>Round 1</option>
-                                <option>Round 2</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="questionTypeSelect" class="block text-sm font-medium">Question Type</label>
-                            <select id="questionTypeSelect" class="select-input">
-                                <option>ALL</option>
-                                <option>Aptitude</option>
-                                <option>Technical</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="questionStatusSelect" class="block text-sm font-medium">Question Status</label>
-                            <select id="questionStatusSelect" class="select-input">
-                                <option>ALL</option>
-                                <option>Approved</option>
-                                <option>Pending</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">PROCEED</button>
-                </div>
-            </section>
-
-            <!-- TPO Registration Section -->
-            <section id="tpo-registration-content" class="content-section hidden">
-                <div class="card">
-                    <div class="flex flex-col sm:flex-row items-center justify-between mb-6 space-y-4 sm:space-y-0">
-                        <h3 class="text-lg sm:text-xl font-semibold">TPO Registration</h3>
-                        <button class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">
-                            <i class="fas fa-plus mr-2"></i>NEW TPO REGISTRATION
-                        </button>
-                    </div>
+            <!-- Profile Management Section -->
+            <section id="profile-management" class="page-section hidden space-y-6">
+                 <div class="card">
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Manage Student Profiles</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                        <div class="registration-card">
-                            <h3>Placement</h3>
-                            <p>Academic Year</p>
-                            <p class="font-bold">2025-26</p>
+                        <!-- Profile Card Example -->
+                        <div class="profile-card">
+                            <i class="fas fa-user-circle"></i>
+                            <h4 class="font-semibold">Alex Johnson</h4>
+                            <p class="text-sm">ID: 12345</p>
+                            <div class="status-icon text-green-500" title="Active"><i class="fas fa-check-circle"></i></div>
+                            <div class="action-icons">
+                                <i class="fas fa-edit edit-icon" title="Edit"></i>
+                                <i class="fas fa-trash-alt delete-icon" title="Delete"></i>
+                            </div>
                         </div>
-                        <div class="registration-card">
-                            <h3>Internship</h3>
-                            <p>Academic Year</p>
-                            <p class="font-bold">2025-26</p>
+                         <div class="profile-card">
+                            <i class="fas fa-user-circle"></i>
+                            <h4 class="font-semibold">Maria Garcia</h4>
+                            <p class="text-sm">ID: 12346</p>
+                            <div class="status-icon text-green-500" title="Active"><i class="fas fa-check-circle"></i></div>
+                             <div class="action-icons">
+                                <i class="fas fa-edit edit-icon" title="Edit"></i>
+                                <i class="fas fa-trash-alt delete-icon" title="Delete"></i>
+                            </div>
                         </div>
-                        <div class="registration-card">
-                            <h3>Placement And Internship</h3>
-                            <p>Academic Year</p>
-                            <p class="font-bold">2025-26</p>
+                        <div class="profile-card">
+                            <i class="fas fa-user-circle"></i>
+                            <h4 class="font-semibold">James Smith</h4>
+                            <p class="text-sm">ID: 12347</p>
+                            <div class="status-icon text-yellow-500" title="Pending"><i class="fas fa-exclamation-circle"></i></div>
+                             <div class="action-icons">
+                                <i class="fas fa-edit edit-icon" title="Edit"></i>
+                                <i class="fas fa-trash-alt delete-icon" title="Delete"></i>
+                            </div>
                         </div>
-                        <div class="registration-card">
-                            <h3>Internship - Performance based PP</h3>
-                            <p>Academic Year</p>
-                            <p class="font-bold">2025-26</p>
-                            <p class="text-sm">0</p>
-                        </div>
-                        <div class="registration-card">
-                            <h3>Industrial Training</h3>
-                            <p>Academic Year</p>
-                            <p class="font-bold">2025-26</p>
+                         <div class="profile-card">
+                            <i class="fas fa-user-circle"></i>
+                            <h4 class="font-semibold">Emily White</h4>
+                            <p class="text-sm">ID: 12348</p>
+                            <div class="status-icon text-red-500" title="Inactive"><i class="fas fa-times-circle"></i></div>
+                             <div class="action-icons">
+                                <i class="fas fa-edit edit-icon" title="Edit"></i>
+                                <i class="fas fa-trash-alt delete-icon" title="Delete"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Off Campus Job Section (New) -->
-            <section id="off-campus-job-content" class="content-section hidden">
+            <!-- Registration Management Section -->
+            <section id="registration-management" class="page-section hidden space-y-6">
                 <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Off Campus Job Opportunities</h3>
-                    <div class="alert-box blue mb-4">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Explore various off-campus job listings.</span>
-                    </div>
-                    <div class="data-table-container">
-                        <table class="w-full text-left data-table">
-                            <thead>
-                                <tr class="table-header rounded-t-lg">
-                                    <th class="p-2 sm:p-4 rounded-tl-lg">Job Title</th>
-                                    <th class="p-2 sm:p-4">Company</th>
-                                    <th class="p-2 sm:p-4">Location</th>
-                                    <th class="p-2 sm:p-4">Date Posted</th>
-                                    <th class="p-2 sm:p-4 rounded-tr-lg">Link</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="5" class="p-4 text-center">No off-campus jobs available at the moment.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">New Student Registration</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Registration Form -->
+                        <div>
+                            <form id="registrationForm" class="space-y-4">
+                                <div>
+                                    <label for="fullName" class="block text-sm font-medium">Full Name</label>
+                                    <input type="text" id="fullName" name="fullName" class="search-input mt-1" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium">Email Address</label>
+                                    <input type="email" id="email" name="email" class="search-input mt-1" required>
+                                </div>
+                                <div>
+                                    <label for="course" class="block text-sm font-medium">Select Course</label>
+                                    <select id="course" name="course" class="select-input mt-1" required>
+                                        <option value="">Choose a course...</option>
+                                        <option value="cs">Computer Science</option>
+                                        <option value="ba">Business Administration</option>
+                                        <option value="gd">Graphic Design</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">Register Student</button>
+                            </form>
+                        </div>
+                        <!-- Registration Info -->
+                        <div class="registration-card">
+                            <h3>Registration Guidelines</h3>
+                            <p>Please fill out all fields to register a new student. An email confirmation will be sent upon successful registration.</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Application Tracking Section -->
-            <section id="application-tracking-content" class="content-section hidden">
+            <!-- Instructions Page Section -->
+            <section id="instructions-page" class="page-section hidden space-y-6">
                 <div class="card">
-                    <h3 class="text-lg sm:text-xl font-semibold mb-4">Application Tracking</h3>
-                    <div class="alert-box red mb-4">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>Please Apply For company</span>
-                        <button class="ml-auto px-3 py-1 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-200 text-xs sm:text-sm">CLOSE</button>
+                    <h3 class="text-lg sm:text-xl font-semibold mb-4">How to Use the Dashboard</h3>
+                    <div class="space-y-4">
+                        <div class="alert-box blue">
+                            <i class="fas fa-info-circle"></i>
+                            <span>This dashboard is designed for simplicity and efficiency.</span>
+                        </div>
+                        <ul class="list-disc list-inside space-y-2 instruction-list">
+                            <li><strong>Home:</strong> Get a quick overview of key metrics and recent activities.</li>
+                            <li><strong>Profile Management:</strong> View, edit, or delete student profiles. Status icons indicate if a student is active, pending, or inactive.</li>
+                            <li><strong>Registration:</strong> Register new students by filling out the form. Select a course from the dropdown menu.</li>
+                            <li><strong>Dark/Light Mode:</strong> Use the moon/sun icon in the header to toggle between themes.</li>
+                            <li><strong>Sidebar:</strong> The sidebar can be collapsed on desktop for more screen space and is accessible via the hamburger menu on mobile.</li>
+                        </ul>
+                         <div class="alert-box red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Always double-check information before submitting or deleting records.</span>
+                        </div>
                     </div>
-                    <p class="text-sm sm:text-base">Your application tracking details will appear here once you apply for companies.</p>
                 </div>
             </section>
-
         </main>
     </div>
-
-    <!-- Generic Modal Structure -->
-    <div id="genericModal" class="modal hidden">
+    
+    <!-- Modal for Registration Confirmation -->
+    <div id="successModal" class="modal hidden">
         <div class="modal-content">
-            <span class="close-button" id="closeModalBtn">&times;</span>
-            <h3 id="modalTitle" class="text-xl sm:text-2xl font-semibold mb-4"></h3>
-            <div id="modalBody">
-                <!-- Form fields or messages will be inserted here -->
-            </div>
-            <div class="flex justify-end mt-6 space-x-4">
-                <button id="cancelModalBtn" class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-300 text-gray-800 hover:bg-gray-400 transition duration-200 text-sm sm:text-base">Cancel</button>
-                <button id="saveModalBtn" class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition duration-200 text-sm sm:text-base">Save</button>
-            </div>
+            <span class="close-button">&times;</span>
+            <h2 class="text-xl font-bold mb-4 text-green-600">Success!</h2>
+            <p>New student has been registered successfully.</p>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            const openSidebarBtn = document.getElementById('openSidebar'); // Mobile hamburger
-            const closeSidebarBtn = document.getElementById('closeSidebar'); // Mobile close button
-            const desktopSidebarToggle = document.getElementById('desktopSidebarToggle'); // New desktop toggle
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            const sidebarSpans = document.querySelectorAll('.sidebar-item span');
-            const sidebarIcons = document.querySelectorAll('.sidebar-item i');
-            const h1Element = document.querySelector('.sidebar-header h1');
-            const imgElement = document.querySelector('.sidebar-header img');
-            const contentSections = document.querySelectorAll('.content-section');
-            const currentSectionTitle = document.getElementById('currentSectionTitle');
-            const themeToggle = document.getElementById('themeToggle');
-            const body = document.body;
-            const eduplusLogo = document.getElementById('eduplusLogo');
 
-            // Modal elements
-            const genericModal = document.getElementById('genericModal');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const cancelModalBtn = document.getElementById('cancelModalBtn');
-            const saveModalBtn = document.getElementById('saveModalBtn');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-
-            // Profile Management elements
-            const profileCardsContainer = document.getElementById('profileCardsContainer');
-            const addProfileSectionBtn = document.getElementById('addProfileSectionBtn');
-
-            // Company Dashboard elements
-            const companyTableBody = document.getElementById('companyTableBody');
-            const searchInput = document.getElementById('searchInput');
-            const rowsPerPageSelect = document.getElementById('rowsPerPage');
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-            const pageNumbersContainer = document.getElementById('pageNumbers');
-
-            // In-memory data for profile sections
-            let profileSectionsData = [
-                { id: 'personal', title: 'Personal Details', icon: 'fas fa-user', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
-                { id: 'examination', title: 'Examination', icon: 'fas fa-graduation-cap', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
-                { id: 'academics', title: 'Academics', icon: 'fas fa-book-open', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
-                { id: 'address', title: 'Address Details', icon: 'fas fa-map-marker-alt', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
-                { id: 'upload-cv', title: 'Upload CV', icon: 'fas fa-file-alt', status: 'completed', statusIcon: 'fas fa-check-circle', statusColor: 'text-green-500' },
-                { id: 'offer-letter', title: 'Offer Letter', icon: 'fas fa-envelope-open-text', status: 'pending', statusIcon: 'fas fa-times-circle', statusColor: 'text-red-500' },
-            ];
-
-            // In-memory data for company dashboard
-            const allCompanyData = [
-                { company: 'Tech Solutions Inc.', info: 'Software Development and Cloud Solutions', criteria: 'CGPA > 7.0', procedure: 'Online Test, Technical Interview, HR Interview', regStart: '2024-07-01 09:00', regEnd: '2024-07-15 17:00', maxPackage: '12 LPA', minPackage: '8 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Global Innovations', info: 'Data Analytics and Business Intelligence', criteria: 'CGPA > 7.5', procedure: 'Case Study, Group Discussion, Interview', regStart: '2024-07-05 10:00', regEnd: '2024-07-20 18:00', maxPackage: '15 LPA', minPackage: '10 LPA', placementType: 'Internship', academicYear: '2025' },
-                { company: 'Creative Minds Ltd.', info: 'UI/UX Design and Product Management', criteria: 'Portfolio Review', procedure: 'Design Challenge, Technical Interview, HR Interview', regStart: '2024-07-10 11:00', regEnd: '2024-07-25 16:00', maxPackage: '9 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
-                { company: 'FutureTech Solutions', info: 'Cloud Engineering and DevOps Practices', criteria: 'CGPA > 6.5', procedure: 'Technical Interview, System Design Round', regStart: '2024-07-12 10:30', regEnd: '2024-07-28 17:30', maxPackage: '14 LPA', minPackage: '9 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Innovate Systems', info: 'Cybersecurity Solutions and Network Security', criteria: 'Certifications', procedure: 'Practical Test, Technical Interview, HR Interview', regStart: '2024-07-15 09:30', regEnd: '2024-07-30 16:00', maxPackage: '13 LPA', minPackage: '8.5 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Data Insights Corp.', info: 'Big Data Solutions', criteria: 'CGPA > 7.2', procedure: 'Coding Test, Technical Interview', regStart: '2024-08-01 09:00', regEnd: '2024-08-15 17:00', maxPackage: '16 LPA', minPackage: '11 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Web Wizards', info: 'Frontend and Backend Web Development', criteria: 'Proficiency in JS frameworks', procedure: 'Live Coding, Project Discussion', regStart: '2024-08-05 10:00', regEnd: '2024-08-20 18:00', maxPackage: '11 LPA', minPackage: '7 LPA', placementType: 'Internship', academicYear: '2026' },
-                { company: 'SecureNet Solutions', info: 'Network Security and Penetration Testing', criteria: 'Relevant Certifications', procedure: 'Practical Lab Test, Interview', regStart: '2024-08-10 11:00', regEnd: '2024-08-25 16:00', maxPackage: '14 LPA', minPackage: '9.5 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'AI Innovators', info: 'Machine Learning and AI Research', criteria: 'Strong Math background', procedure: 'Research Paper Presentation, Technical Interview', regStart: '2024-08-12 10:30', regEnd: '2024-08-28 17:30', maxPackage: '18 LPA', minPackage: '13 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Cloud Builders', info: 'Cloud Infrastructure and Architecture', criteria: 'AWS/Azure Certifications', procedure: 'System Design Interview, Behavioral Interview', regStart: '2024-08-15 09:30', regEnd: '2024-08-30 16:00', maxPackage: '17 LPA', minPackage: '12 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'Mobile Masters', info: 'iOS and Android App Development', criteria: 'Portfolio of apps', procedure: 'App Demo, Technical Interview', regStart: '2024-09-01 09:00', regEnd: '2024-09-15 17:00', maxPackage: '10 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
-                { company: 'Game Changers Studio', info: 'Game Design and Development', criteria: 'Gaming projects', procedure: 'Game Demo, Creative Interview', regStart: '2024-09-05 10:00', regEnd: '2024-09-20 18:00', maxPackage: '11 LPA', minPackage: '7 LPA', placementType: 'Internship', academicYear: '2026' },
-                { company: 'FinTech Solutions', info: 'Financial Technology Development', criteria: 'Strong analytical skills', procedure: 'Quant Test, Technical Interview', regStart: '2024-09-10 11:00', regEnd: '2024-09-25 16:00', maxPackage: '16 LPA', minPackage: '10 LPA', placementType: 'Full-time', academicYear: '2025' },
-                { company: 'EduTech Innovations', info: 'Educational Software Development', criteria: 'Passion for education', procedure: 'Product Ideation, Technical Interview', regStart: '2024-09-12 10:30', regEnd: '2024-09-28 17:30', maxPackage: '9 LPA', minPackage: '6 LPA', placementType: 'Full-time', academicYear: '2026' },
-                { company: 'HealthTech Connect', info: 'Healthcare IT Solutions', criteria: 'Understanding of healthcare domain', procedure: 'Case Study, Interview', regStart: '2024-09-15 09:30', regEnd: '2024-09-30 16:00', maxPackage: '13 LPA', minPackage: '8 LPA', placementType: 'Full-time', academicYear: '2025' }
-            ];
-            let filteredCompanyData = [...allCompanyData]; // Data currently being displayed/filtered
-            let currentPage = 1;
-            let rowsPerPage = parseInt(rowsPerPageSelect.value);
-
-            // Function to open sidebar (mobile)
-            const openSidebar = () => {
-                sidebar.classList.add('open');
-                sidebarOverlay.style.display = 'block';
-                body.style.overflow = 'hidden'; // Prevent scrolling on body when sidebar is open
-                // Ensure text and logo are visible when sidebar opens on mobile
-                sidebarSpans.forEach(span => span.classList.remove('hidden'));
-                h1Element.classList.remove('hidden');
-                imgElement.classList.add('mr-3');
-                imgElement.classList.remove('mr-0');
-            };
-
-            // Function to close sidebar (mobile)
-            const closeSidebar = () => {
-                sidebar.classList.remove('open');
-                sidebarOverlay.style.display = 'none';
-                body.style.overflow = ''; // Restore scrolling on body
-                // Hide text and logo when sidebar closes on mobile
-                if (window.innerWidth < 768) {
-                    sidebarSpans.forEach(span => span.classList.add('hidden'));
-                    h1Element.classList.add('hidden');
-                    imgElement.classList.remove('mr-3');
-                    imgElement.classList.add('mr-0');
-                }
-            };
-
-            // Event listeners for sidebar toggle buttons
-            openSidebarBtn.addEventListener('click', openSidebar);
-            closeSidebarBtn.addEventListener('click', closeSidebar);
-            sidebarOverlay.addEventListener('click', closeSidebar); // Close sidebar when clicking overlay
-
-            // Function to toggle sidebar state (for desktop collapse)
-            const toggleDesktopSidebar = () => {
-                sidebar.classList.toggle('collapsed');
-                // Toggle visibility of text and logo based on collapsed state
-                if (sidebar.classList.contains('collapsed')) {
-                    sidebarSpans.forEach(span => span.classList.add('hidden'));
-                    h1Element.classList.add('hidden');
-                    imgElement.classList.remove('mr-3');
-                    imgElement.classList.add('mr-0');
-                } else {
-                    sidebarSpans.forEach(span => span.classList.remove('hidden'));
-                    h1Element.classList.remove('hidden');
-                    imgElement.classList.add('mr-3');
-                    imgElement.classList.remove('mr-0');
-                }
-            };
-            // Event listener for desktop sidebar toggle button
-            desktopSidebarToggle.addEventListener('click', toggleDesktopSidebar);
-
-
-            // Function to show a specific content section
-            const showSection = (sectionId) => {
-                closeModal(); // Close any open modal when changing sections
-
-                contentSections.forEach(section => {
-                    section.classList.add('hidden');
-                });
-                document.getElementById(`${sectionId}-content`).classList.remove('hidden');
-
-                // Update header title based on section
-                let title = '';
-                if (sectionId === 'home-page') {
-                    title = 'Eduplus Campus TPO Home Page';
-                } else {
-                    const activeItem = document.querySelector(`.sidebar-item[data-section="${sectionId}"]`);
-                    if (activeItem) {
-                        title = activeItem.querySelector('span').textContent;
-                    }
-                }
-                currentSectionTitle.textContent = title;
-
-                // Update active sidebar item
-                sidebarItems.forEach(nav => nav.classList.remove('active'));
-                const correspondingSidebarItem = document.querySelector(`.sidebar-item[data-section="${sectionId}"]`);
-                if (correspondingSidebarItem) {
-                    correspondingSidebarItem.classList.add('active');
-                }
-
-                // If navigating to fill-profile, re-render cards
-                if (sectionId === 'fill-profile') {
-                    renderProfileCards();
-                }
-                 // If navigating to company-dashboard, re-render table
-                if (sectionId === 'company-dashboard') {
-                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-                }
-
-                // Close sidebar on small screens after selecting a section
-                if (window.innerWidth < 768) { // Use < instead of <= for consistency with media query
-                    closeSidebar();
-                }
-            };
-
-            // Add active class and section switching to sidebar items
-            sidebarItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const sectionId = item.dataset.section;
-                    showSection(sectionId);
-                });
-            });
-
-            // Event listener for Eduplus logo to go to Home Page
-            if (eduplusLogo) {
-                eduplusLogo.addEventListener('click', () => {
-                    showSection('home-page');
-                });
-            }
-
-            // Theme Toggle Logic
-            const applyTheme = (isDarkMode) => {
-                if (isDarkMode) {
-                    body.classList.add('dark-mode');
-                    themeToggle.querySelector('i').classList.remove('fa-moon');
-                    themeToggle.querySelector('i').classList.add('fa-sun');
-                } else {
-                    body.classList.remove('dark-mode');
-                    themeToggle.querySelector('i').classList.remove('fa-sun');
-                    themeToggle.querySelector('i').classList.add('fa-moon');
-                }
-            };
-
-            themeToggle.addEventListener('click', () => {
-                const isDarkMode = body.classList.contains('dark-mode');
-                applyTheme(!isDarkMode);
-                localStorage.setItem('darkMode', !isDarkMode); // Save preference
-            });
-
-            // Load theme preference from localStorage
-            const savedTheme = localStorage.getItem('darkMode');
-            if (savedTheme === 'true') {
-                applyTheme(true);
-            } else {
-                applyTheme(false); // Default to light mode if no preference or 'false'
-            }
-
-            /* Profile Management Functions */
-
-            // Function to render profile cards
-            const renderProfileCards = () => {
-                profileCardsContainer.innerHTML = ''; // Clear existing cards
-                profileSectionsData.forEach(section => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.dataset.id = section.id; // Store ID for actions
-
-                    card.innerHTML = `
-                        <i class="${section.icon}"></i>
-                        <h4 class="font-medium">${section.title}</h4>
-                        <i class="${section.statusIcon} ${section.statusColor} status-icon"></i>
-                        <div class="action-icons">
-                            <i class="fas fa-edit edit-icon" data-id="${section.id}"></i>
-                            <i class="fas fa-trash-alt delete-icon" data-id="${section.id}"></i>
-                        </div>
-                    `;
-                    profileCardsContainer.appendChild(card);
-                });
-
-                // Add event listeners for edit and delete icons after rendering
-                document.querySelectorAll('.edit-icon').forEach(icon => {
-                    icon.addEventListener('click', (event) => {
-                        event.stopPropagation(); // Prevent card click if it had one
-                        const id = event.target.dataset.id;
-                        openProfileModal(id);
-                    });
-                });
-
-                document.querySelectorAll('.delete-icon').forEach(icon => {
-                    icon.addEventListener('click', (event) => {
-                        event.stopPropagation(); // Prevent card click if it had one
-                        const id = event.target.dataset.id;
-                        deleteProfileSection(id);
-                    });
-                });
-            };
-
-            // Open modal for adding/editing profile section
-            const openProfileModal = (id = null) => {
-                genericModal.classList.remove('hidden');
-                let section = { id: '', title: '', icon: '', status: 'pending' }; // Default for new
-                let isEditing = false;
-
-                if (id) {
-                    isEditing = true;
-                    section = profileSectionsData.find(s => s.id === id);
-                    modalTitle.textContent = `Edit ${section.title}`;
-                } else {
-                    modalTitle.textContent = 'Add New Profile Section';
-                }
-
-                modalBody.innerHTML = `
-                    <div class="mb-4">
-                        <label for="sectionTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Section Title</label>
-                        <input type="text" id="sectionTitle" class="mt-1 block w-full search-input" value="${section.title}" placeholder="e.g., Certificates">
-                    </div>
-                    <div class="mb-4">
-                        <label for="sectionIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon Class (Font Awesome)</label>
-                        <input type="text" id="sectionIcon" class="mt-1 block w-full search-input" value="${section.icon}" placeholder="e.g., fas fa-award">
-                        <p class="text-xs text-gray-500 mt-1">Find icons at <a href="https://fontawesome.com/icons" target="_blank" class="text-blue-500 hover:underline">fontawesome.com/icons</a></p>
-                    </div>
-                    <div class="mb-4">
-                        <label for="sectionStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                        <select id="sectionStatus" class="mt-1 block w-full select-input">
-                            <option value="completed" ${section.status === 'completed' ? 'selected' : ''}>Completed</option>
-                            <option value="pending" ${section.status === 'pending' ? 'selected' : ''}>Pending</option>
-                        </select>
-                    </div>
-                `;
-
-                // Store current ID in save button for reference
-                saveModalBtn.dataset.id = id;
-                saveModalBtn.dataset.isEditing = isEditing;
-            };
-
-            // Close modal
-            const closeModal = () => {
-                genericModal.classList.add('hidden');
-            };
-
-            // Save profile section
-            const saveProfileSection = () => {
-                const id = saveModalBtn.dataset.id;
-                const isEditing = saveModalBtn.dataset.isEditing === 'true';
-                const title = document.getElementById('sectionTitle').value.trim();
-                const icon = document.getElementById('sectionIcon').value.trim();
-                const status = document.getElementById('sectionStatus').value;
-
-                if (!title || !icon) {
-                    // Replaced alert with a custom message in the modal body for better UX
-                    modalBody.insertAdjacentHTML('afterbegin', '<p class="text-red-500 text-sm mb-2">Please fill in all fields.</p>');
-                    return;
-                }
-
-                const statusIcon = status === 'completed' ? 'fas fa-check-circle' : 'fas fa-times-circle';
-                const statusColor = status === 'completed' ? 'text-green-500' : 'text-red-500';
-
-                if (isEditing) {
-                    // Update existing section
-                    const index = profileSectionsData.findIndex(s => s.id === id);
-                    if (index !== -1) {
-                        profileSectionsData[index] = { ...profileSectionsData[index], title, icon, status, statusIcon, statusColor };
-                    }
-                } else {
-                    // Add new section
-                    const newId = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''); // Simple ID generation
-                    profileSectionsData.push({ id: newId, title, icon, status, statusIcon, statusColor });
-                }
-
-                renderProfileCards();
-                closeModal();
-            };
-
-            // Delete profile section
-            const deleteProfileSection = (id) => {
-                // Replaced confirm with a custom modal for better UX
-                openConfirmationModal('Delete Profile Section', 'Are you sure you want to delete this profile section?', () => {
-                    profileSectionsData = profileSectionsData.filter(s => s.id !== id);
-                    renderProfileCards();
-                    closeModal(); // Close confirmation modal after action
-                });
-            };
-
-            // Function to open a generic confirmation modal
-            const openConfirmationModal = (title, message, onConfirm) => {
-                genericModal.classList.remove('hidden');
-                modalTitle.textContent = title;
-                modalBody.innerHTML = `<p class="text-base">${message}</p>`;
-                saveModalBtn.textContent = 'Confirm';
-                saveModalBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                saveModalBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-
-                // Temporarily remove existing save listener to prevent conflicts
-                saveModalBtn.removeEventListener('click', saveProfileSection);
-                saveModalBtn.removeEventListener('click', handleSaveConfirmation); // Remove any previous confirmation handler
-
-                const handleSaveConfirmation = () => {
-                    onConfirm();
-                    // Restore original save button state
-                    saveModalBtn.textContent = 'Save';
-                    saveModalBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    saveModalBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-                    saveModalBtn.removeEventListener('click', handleSaveConfirmation); // Clean up
-                    saveModalBtn.addEventListener('click', saveProfileSection); // Re-add original
-                };
-                saveModalBtn.addEventListener('click', handleSaveConfirmation);
-            };
-
-
-            // Event Listeners for Modal
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelModalBtn.addEventListener('click', closeModal);
-            saveModalBtn.addEventListener('click', saveProfileSection); // Default save handler
-            addProfileSectionBtn.addEventListener('click', () => openProfileModal(null));
-
-            /* Company Dashboard Pagination and Search Functions */
-
-            // Function to display table data for the current page
-            const displayCompanyTable = (data, page, rows) => {
-                companyTableBody.innerHTML = ''; // Clear current table
-                const start = (page - 1) * rows;
-                const end = start + rows;
-                const paginatedItems = data.slice(start, end);
-
-                if (paginatedItems.length === 0) {
-                    companyTableBody.innerHTML = `<tr><td colspan="10" class="p-4 text-center">No companies found.</td></tr>`;
-                    pageNumbersContainer.innerHTML = '';
-                    prevPageBtn.disabled = true;
-                    nextPageBtn.disabled = true;
-                    return;
-                }
-
-                paginatedItems.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.className = 'table-row';
-                    row.innerHTML = `
-                        <td class="p-2 sm:p-4">${item.company}</td>
-                        <td class="p-2 sm:p-4">${item.info}</td>
-                        <td class="p-2 sm:p-4">${item.criteria}</td>
-                        <td class="p-2 sm:p-4">${item.procedure}</td>
-                        <td class="p-2 sm:p-4">${item.regStart}</td>
-                        <td class="p-2 sm:p-4">${item.regEnd}</td>
-                        <td class="p-2 sm:p-4">${item.maxPackage}</td>
-                        <td class="p-2 sm:p-4">${item.minPackage}</td>
-                        <td class="p-2 sm:p-4">${item.placementType}</td>
-                        <td class="p-2 sm:p-4">${item.academicYear}</td>
-                    `;
-                    companyTableBody.appendChild(row);
-                });
-                setupPagination(data.length, page, rows);
-            };
-
-            // Function to set up pagination controls
-            const setupPagination = (totalItems, page, rows) => {
-                pageNumbersContainer.innerHTML = '';
-                const pageCount = Math.ceil(totalItems / rows);
-
-                for (let i = 1; i <= pageCount; i++) {
-                    const btn = document.createElement('button');
-                    btn.classList.add('pagination-button');
-                    btn.textContent = i;
-                    if (i === page) {
-                        btn.classList.add('active');
-                    }
-                    btn.addEventListener('click', () => {
-                        currentPage = i;
-                        displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-                    });
-                    pageNumbersContainer.appendChild(btn);
-                }
-
-                prevPageBtn.disabled = currentPage === 1;
-                nextPageBtn.disabled = currentPage === pageCount;
-            };
-
-            // Event Listeners for Pagination
-            prevPageBtn.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-                }
-            });
-
-            nextPageBtn.addEventListener('click', () => {
-                const pageCount = Math.ceil(filteredCompanyData.length / rowsPerPage);
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-                }
-            });
-
-            rowsPerPageSelect.addEventListener('change', (event) => {
-                rowsPerPage = parseInt(event.target.value);
-                currentPage = 1; // Reset to first page when rows per page changes
-                displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-            });
-
-            // Search functionality
-            searchInput.addEventListener('keyup', (event) => {
-                const searchTerm = event.target.value.toLowerCase();
-                filteredCompanyData = allCompanyData.filter(item =>
-                    Object.values(item).some(value =>
-                        String(value).toLowerCase().includes(searchTerm)
-                    )
-                );
-                currentPage = 1; // Reset to first page on new search
-                displayCompanyTable(filteredCompanyData, currentPage, rowsPerPage);
-            });
-
-            // Handle window resize for sidebar behavior
-            const handleResize = () => {
-                if (window.innerWidth >= 768) { // Desktop view
-                    sidebar.classList.remove('open'); // Ensure mobile overlay is closed
-                    sidebarOverlay.style.display = 'none'; // Hide overlay
-                    body.style.overflow = ''; // Restore body scrolling
-                    openSidebarBtn.classList.add('hidden'); // Hide mobile hamburger
-                    desktopSidebarToggle.classList.remove('hidden'); // Show desktop toggle
-
-                    // Ensure desktop sidebar is initially expanded or respects its last state
-                    if (!sidebar.classList.contains('collapsed')) { // Only expand if not explicitly collapsed
-                        sidebarSpans.forEach(span => span.classList.remove('hidden'));
-                        h1Element.classList.remove('hidden');
-                        imgElement.classList.add('mr-3');
-                        imgElement.classList.remove('mr-0');
-                    } else { // If it was collapsed, keep text hidden
-                        sidebarSpans.forEach(span => span.classList.add('hidden'));
-                        h1Element.classList.add('hidden');
-                        imgElement.classList.remove('mr-3');
-                        imgElement.classList.add('mr-0');
-                    }
-                } else { // Mobile view
-                    // Ensure sidebar is closed and hamburger is visible
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.style.display = 'none';
-                    body.style.overflow = '';
-                    openSidebarBtn.classList.remove('hidden'); // Show mobile hamburger
-                    desktopSidebarToggle.classList.add('hidden'); // Hide desktop toggle
-
-                    // When in mobile view, if sidebar is open, show text. If closed, hide text.
-                    if (sidebar.classList.contains('open')) {
-                        sidebarSpans.forEach(span => span.classList.remove('hidden'));
-                        h1Element.classList.remove('hidden');
-                        imgElement.classList.add('mr-3');
-                        imgElement.classList.remove('mr-0');
-                    } else {
-                        sidebarSpans.forEach(span => span.classList.add('hidden'));
-                        h1Element.classList.add('hidden');
-                        imgElement.classList.remove('mr-3');
-                        imgElement.classList.add('mr-0');
-                    }
-                }
-            };
-
-            window.addEventListener('resize', handleResize);
-
-            // Initial call to set up responsiveness on load
-            handleResize();
-            // Initially show the Home Page
-            showSection('home-page');
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
